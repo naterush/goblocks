@@ -27,7 +27,7 @@ func main() {
         "2.0",
         "eth_getBlockByNumber",
         Params{"0x1b4", true},
-        1,
+        10000101010,
     }
 
     payloadBytes, err := json.Marshal(data)
