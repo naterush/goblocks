@@ -14,17 +14,19 @@ func test() {
 }
 
 func main() {
+    type Params []interface{}
+
     type Payload struct {
         Jsonrpc string        `json:"jsonrpc"`
         Method  string        `json:"method"`
-        Params  interface{} `json:"params"`
+        Params                 `json:"params"`
         ID      int           `json:"id"`
     }
 
     data := Payload{
         "2.0",
         "eth_getBlockByNumber",
-        "0x1b4",
+        Params{"0x1b4", true},
         1,
     }
 
@@ -34,6 +36,11 @@ func main() {
     }
     //fmt.Println(data)
     body := bytes.NewReader(payloadBytes)
+    //buf := new(bytes.Buffer)
+    //buf.ReadFrom(body)
+    //s := buf.String()
+
+    //fmt.Println(s)
 
     req, err := http.NewRequest("POST", "http://localhost:8545", body)
     if err != nil {
