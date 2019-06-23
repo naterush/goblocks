@@ -53,7 +53,7 @@ func getBlock(block int) {
 
     //body1, err := ioutil.ReadAll(resp.Body)
 
-    //fmt.Println(string(body1))
+    fmt.Println("done")
     waitgroup.Done()
 
 }
