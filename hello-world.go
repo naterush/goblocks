@@ -24,7 +24,7 @@ func main() {
     data := Payload{
         "2.0",
         "eth_getBlockByNumber",
-        "0x1b4, true",
+        "0x1b4",
         1,
     }
 
