@@ -19,14 +19,14 @@ func main() {
     type Payload struct {
         Jsonrpc string        `json:"jsonrpc"`
         Method  string        `json:"method"`
-        Params                 `json:"params"`
+        Params                `json:"params"`
         ID      int           `json:"id"`
     }
 
     data := Payload{
         "2.0",
         "eth_getBlockByNumber",
-        Params{"0x4C4B40", true},
+        Params{"0x4C4B40", false},
         2,
     }
 
