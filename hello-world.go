@@ -19,7 +19,7 @@ type Payload struct {
 }
 
 func getBlock(block int) {
-    hexBlockNum := fmt.Sprintf("%x", block)
+    hexBlockNum := fmt.Sprintf("0x%x", block)
 
     data := Payload{
         "2.0",
