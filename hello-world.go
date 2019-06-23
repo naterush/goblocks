@@ -56,5 +56,7 @@ func getBlock(block int) {
 
 
 func main() {
-    getBlock(5000000)    
+    for i := 5000000; i < 5000100; i++ {
+        getBlock(i)    
+    }
 }
