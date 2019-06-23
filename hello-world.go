@@ -7,6 +7,7 @@ import (
     "bytes"
     //"io/ioutil"
     "time"
+    "sync"
 )
 
 
@@ -53,14 +54,21 @@ func getBlock(block int) {
     //body1, err := ioutil.ReadAll(resp.Body)
 
     //fmt.Println(string(body1))
+    waitgroup.Done()
+
 }
+
+var waitgroup sync.WaitGroup
 
 
 func main() {
     start := time.Now()
+    waitgroup.Add(5005000 - 5000000)
     for i := 5000000; i < 5005000; i++ {
         go getBlock(i)    
     }
     elapsed := time.Since(start)
+    waitgroup.Wait()
+
     fmt.Println("Took time:", elapsed)
 }
