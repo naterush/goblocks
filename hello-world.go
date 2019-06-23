@@ -6,6 +6,7 @@ import (
     "encoding/json"
     "bytes"
     "io/ioutil"
+    "time"
 )
 
 
@@ -51,12 +52,15 @@ func getBlock(block int) {
 
     body1, err := ioutil.ReadAll(resp.Body)
 
-    fmt.Println(string(body1))
+    //fmt.Println(string(body1))
 }
 
 
 func main() {
+    start := time.Now()
     for i := 5000000; i < 5001000; i++ {
         getBlock(i)    
-	}
+    }
+    elapsed := time.Since(start)
+    fmt.Println("Took time:", elapsed)
 }
