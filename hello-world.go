@@ -53,5 +53,5 @@ func main() {
 
     body1, err := ioutil.ReadAll(resp.Body)
 
-    fmt.Println("Body1:", body1)
+    fmt.Println("Body1:", string(body1))
 }
