@@ -50,7 +50,7 @@ func getBlock(block int) {
 
     defer resp.Body.Close()
 
-    body1, err := ioutil.ReadAll(resp.Body)
+    //body1, err := ioutil.ReadAll(resp.Body)
 
     //fmt.Println(string(body1))
 }
