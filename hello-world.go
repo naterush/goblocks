@@ -9,24 +9,22 @@ import (
 )
 
 
-func test() {
+type Params []interface{}
 
+type Payload struct {
+    Jsonrpc string        `json:"jsonrpc"`
+    Method  string        `json:"method"`
+    Params                `json:"params"`
+    ID      int           `json:"id"`
 }
 
-func main() {
-    type Params []interface{}
-
-    type Payload struct {
-        Jsonrpc string        `json:"jsonrpc"`
-        Method  string        `json:"method"`
-        Params                `json:"params"`
-        ID      int           `json:"id"`
-    }
+func getBlock(block int) {
+    hexBlockNum := fmt.Sprintf("%x", i)
 
     data := Payload{
         "2.0",
         "eth_getBlockByNumber",
-        Params{"0x4C4B40", false},
+        Params{hexBlockNum, false},
         2,
     }
 
@@ -54,4 +52,9 @@ func main() {
     body1, err := ioutil.ReadAll(resp.Body)
 
     fmt.Println(string(body1))
+}
+
+
+func main() {
+    getBlock(5000000)    
 }
