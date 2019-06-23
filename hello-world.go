@@ -41,7 +41,8 @@ func main() {
     req.Header.Set("Content-Type", "application/json")
 
     resp, err := http.DefaultClient.Do(req)
-    fmt.Println(err)
+    fmt.Println("Resp:", resp)
+    fmt.Println("Error:", err)
 
     if err != nil {
         return
