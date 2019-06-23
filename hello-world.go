@@ -5,6 +5,7 @@ import (
     "net/http"
     "encoding/json"
     "bytes"
+    "io/ioutil"
 )
 
 
@@ -49,5 +50,8 @@ func main() {
     }
 
     defer resp.Body.Close()
-    fmt.Println("DONE")
+
+    body1, err := ioutil.ReadAll(resp.Body)
+
+    fmt.Println("Body1:", body1)
 }
