@@ -23,7 +23,7 @@ func main() {
     data := Payload{
         "2.0",
         "eth_getBlockByNumber",
-        "0x1b4",
+        "0x1b4, true",
         1,
     }
 
@@ -31,6 +31,7 @@ func main() {
     if err != nil {
         return
     }
+    //fmt.Println(data)
     body := bytes.NewReader(payloadBytes)
 
     req, err := http.NewRequest("POST", "http://localhost:8545", body)
@@ -40,9 +41,12 @@ func main() {
     req.Header.Set("Content-Type", "application/json")
 
     resp, err := http.DefaultClient.Do(req)
+    fmt.Println(err)
+
     if err != nil {
         return
     }
+
     defer resp.Body.Close()
     fmt.Println("DONE")
 }
