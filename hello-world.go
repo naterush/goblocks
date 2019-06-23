@@ -59,7 +59,7 @@ func getBlock(block int) {
 func main() {
     start := time.Now()
     for i := 5000000; i < 5005000; i++ {
-        getBlock(i)    
+        go getBlock(i)    
     }
     elapsed := time.Since(start)
     fmt.Println("Took time:", elapsed)
