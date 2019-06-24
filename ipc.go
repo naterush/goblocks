@@ -65,7 +65,7 @@ func getBlock(block int) string {
 
 func main() {
 	conn, err := net.Dial("unix", "~/.local/share/io.ethereum.parity/jsonrpc.ipc")
-	if err == nil {
+	if err != nil {
 		fmt.Println("Errror", err)
 	}
 	fmt.Println("HERE", conn)
