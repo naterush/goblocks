@@ -81,7 +81,7 @@ func main() {
 
     start = time.Now()
     for i := 5000000; i < 5000000 + numBlocks; i++ {
-        getBlock(i, true)    
+        getBlock(i, false)    
     }
     elapsed = time.Since(start)
 
