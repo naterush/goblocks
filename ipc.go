@@ -64,7 +64,7 @@ func getBlock(block int) string {
 }
 
 func main() {
-	conn, err := net.Dial("unix", "~/.local/share/io.parity.ethereum/jsonrpc.ipc")
+	conn, err := net.Dial("unix", "/home/jrush/.local/share/io.parity.ethereum/jsonrpc.ipc")
 	if err != nil {
 		fmt.Println("Errror", err)
 	}
