@@ -72,8 +72,7 @@ func main() {
 
     blocks := make(chan int)
 
-    // Make 500 dedicated block processors
-    for i := 0; i < 250; i++ {
+    for i := 0; i < 1; i++ {
         go blockProcessor(blocks)
     }
 
