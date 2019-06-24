@@ -112,6 +112,12 @@ func main() {
 
     elapsed := time.Since(start)
     fmt.Println("Concurrent took time:", elapsed)
+
+    for k, v := range m {
+        if v == "" {
+            fmt.Printf("key[%s] value[%s]\n", k, v)
+        }
+    }
     //fmt.Println("map:", m)
 
     
