@@ -26,36 +26,35 @@ type Result struct {
     body string
 }
 
-type Action struct {
-    callType string
-    from string
-    gas string
-    input string
-    to string 
-    value string
-}
-
-type TraceResult struct {
-    gasUsed string
-    output string
-}
-
-type TraceObj struct {
-    action Action
-    blockHash string
-    blockNumber int
-    result TraceResult
-    subtraces int
-    traceAddress []interface{}
-    transactionHash string
-    transactionPosition int
-    ttype string
-}
-
-type TraceJSON struct {
-    id string
-    jsonrpc string
-    result []TraceObj
+type BlockTraces struct {
+	Jsonrpc string `json:"jsonrpc"`
+	Result  []struct {
+		Action struct {
+			CallType string `json:"callType"`
+			From     string `json:"from"`
+			Gas      string `json:"gas"`
+			Input    string `json:"input"`
+			To       string `json:"to"`
+			Value    string `json:"value"`
+		} `json:"action,omitempty"`
+		BlockHash   string `json:"blockHash"`
+		BlockNumber int    `json:"blockNumber"`
+		Result      struct {
+			GasUsed string `json:"gasUsed"`
+			Output  string `json:"output"`
+		} `json:"result"`
+		Subtraces           int           `json:"subtraces"`
+		TraceAddress        []interface{} `json:"traceAddress"`
+		TransactionHash     string        `json:"transactionHash"`
+		TransactionPosition int           `json:"transactionPosition"`
+		Type                string        `json:"type"`
+		Action              struct {
+			Author     string `json:"author"`
+			RewardType string `json:"rewardType"`
+			Value      string `json:"value"`
+		} `json:"action,omitempty"`
+	} `json:"result"`
+	ID int `json:"id"`
 }
 
 
@@ -99,7 +98,7 @@ func traceProcessor(blocks chan int) {
         resp.Body.Close()
         fmt.Println(string(body1))
 
-        var traces TraceJSON
+        var traces BlockTraces
         err = json.Unmarshal(body1, &traces)
 	    if err != nil {
 	    	fmt.Println("error:", err)
