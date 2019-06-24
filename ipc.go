@@ -70,23 +70,29 @@ func main() {
 
 	conn, err := net.Dial("unix", "/home/jrush/.local/share/io.parity.ethereum/jsonrpc.ipc")
 	if err != nil {
-		fmt.Println("Errror", err)
+		fmt.Println("Error", err)
 	}
 
 	for i := 0; i < 10000; i++ {
 		req := "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getBlockByNumber\", \"params\": [\"0x4C4B40\", false], \"id\": 100}\n"
-		fmt.Println("Request:", req)
 
 		conn.Write([]byte(req))
-		status, err := bufio.NewReader(conn).ReadString('\n')
+		_, err := bufio.NewReader(conn).ReadString('\n')
 		if err != nil {
-			fmt.Println("Errror", err)
+			fmt.Println("Error", err)
 		}
-
-		fmt.Println("HERE", status)
 	}
 
 	elapsed := time.Since(start)
-    fmt.Println("Took time:", elapsed)
+	fmt.Println("Pipe time:", elapsed)
+
+	start1 := time.Now()
+	
+	for i := 0; i < 10000; i++ {
+		getBlock(5000000)
+	}
+	
+	elapsed1 := time.Since(start1)
+	fmt.Println("Curl took time:", elapsed1)
 	
 }
