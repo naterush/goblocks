@@ -7,6 +7,7 @@ import (
     "bytes"
 	"io/ioutil"
 	"net"
+	"os"
 )
 
 
@@ -64,7 +65,14 @@ func getBlock(block int) string {
 }
 
 func main() {
-	l, err := net.Listen("unix", "~/.local/share/io.ethereum.parity/jsonrpc.ipc")
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error", err)
+	}
+  	fmt.Println(dir)
+
+
+	l, err := net.Listen("unix", "/.local/share/io.ethereum.parity/jsonrpc.ipc")
 	if err != nil {
 		fmt.Println("Error", err)
 	}
