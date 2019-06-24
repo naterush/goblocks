@@ -28,7 +28,6 @@ func traceProcessor(blocks chan int) {
     // Process blocks untill the blocks channel closes
     for block := range blocks {
         hexBlockNum := fmt.Sprintf("0x%x", block)
-
         data := Payload{
             "2.0",
             "trace_block",
@@ -133,7 +132,7 @@ func sequentialHTTP() {
     }
 
     // Send the blocks to be processed
-    for i := 0; i < 1; i++ {
+    for i := 0; i < 50; i++ {
         blocks <- 5000000
     }
 }
