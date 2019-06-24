@@ -35,7 +35,9 @@ type BlockTraces struct {
 			Gas      string `json:"gas"`
 			Input    string `json:"input"`
 			To       string `json:"to"`
-			Value    string `json:"value"`
+            Value    string `json:"value"`
+            Author     string `json:"author"`
+			RewardType string `json:"rewardType"`
 		} `json:"action,omitempty"`
 		BlockHash   string `json:"blockHash"`
 		BlockNumber int    `json:"blockNumber"`
@@ -47,7 +49,7 @@ type BlockTraces struct {
 		TraceAddress        []interface{} `json:"traceAddress"`
 		TransactionHash     string        `json:"transactionHash"`
 		TransactionPosition int           `json:"transactionPosition"`
-		Type                string        `json:"type"`
+        Type                string        `json:"type"`
 	} `json:"result"`
 	ID int `json:"id"`
 }
