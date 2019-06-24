@@ -21,6 +21,42 @@ type Payload struct {
 }
 
 
+type Result struct {
+    block int
+    body string
+}
+
+type Action struct {
+    callType string
+    from string
+    gas string
+    input string
+    to string 
+    value string
+}
+
+type TraceResult struct {
+    gasUsed string
+    output string
+}
+
+type TraceObj struct {
+    action Action
+    blockHash string
+    blockNumber int
+    result TraceResult
+    subtraces int
+    traceAddress []interface{}
+    transactionHash string
+    transactionPosition int
+    ttype string
+}
+
+type TraceJSON struct {
+    id string
+    jsonrpc string
+    result []TraceObj
+}
 
 
 func traceProcessor(blocks chan int) {
@@ -62,6 +98,13 @@ func traceProcessor(blocks chan int) {
         }
         resp.Body.Close()
         fmt.Println(string(body1))
+
+        var traces TraceJSON
+        err = json.Unmarshal(body1, &traces)
+	    if err != nil {
+	    	fmt.Println("error:", err)
+	    }
+	    fmt.Printf("%+v", traces)
     }
 }
 
@@ -132,7 +175,7 @@ func sequentialHTTP() {
 
     // Send the blocks to be processed
     for i := 0; i < 2; i++ {
-        blocks <- 5000000
+        blocks <- 7223970
     }
 }
 
