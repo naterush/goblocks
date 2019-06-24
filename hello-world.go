@@ -69,7 +69,7 @@ func getBlock(block int, res chan Result) {
 func main() {
     start := time.Now()
 
-    numBlocks := 1000
+    numBlocks := 2000
     res := make(chan Result)
 
     for i := 5000000; i < 5000000 + numBlocks; i++ {
