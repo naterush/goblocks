@@ -11,6 +11,17 @@ import (
 
 
 
+type Params []interface{}
+
+type Payload struct {
+    Jsonrpc string        `json:"jsonrpc"`
+    Method  string        `json:"method"`
+    Params                `json:"params"`
+    ID      int           `json:"id"`
+}
+
+
+
 
 func traceProcessor(blocks chan int) {
     // Process blocks untill the blocks channel closes
