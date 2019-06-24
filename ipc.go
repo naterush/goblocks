@@ -72,7 +72,7 @@ func main() {
   	fmt.Println(dir)
 
 
-	l, err := net.Listen("unix", "/.local/share/io.ethereum.parity/jsonrpc.ipc")
+	l, err := net.Listen("unix", "~/.local/share/io.ethereum.parity/jsonrpc.ipc")
 	if err != nil {
 		fmt.Println("Error", err)
 	}
