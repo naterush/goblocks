@@ -69,6 +69,46 @@ func blockProcessor(blocks chan int, res chan Result) {
     }
 }
 
+
+func getBlock(block int) string {
+    // Process blocks untill the blocks channel closes
+    hexBlockNum := fmt.Sprintf("0x%x", block)
+
+    data := Payload{
+        "2.0",
+        "eth_getBlockByNumber",
+        Params{hexBlockNum, false},
+        2,
+    }
+
+    payloadBytes, err := json.Marshal(data)
+    if err != nil {
+        fmt.Println("Error:", err)
+        return ""
+    }
+
+    body := bytes.NewReader(payloadBytes)
+
+    req, err := http.NewRequest("POST", "http://localhost:8545", body)
+    if err != nil {
+        fmt.Println("Error:", err)
+        return ""
+    }
+    req.Header.Set("Content-Type", "application/json")
+
+    resp, err := http.DefaultClient.Do(req)
+
+    if err != nil {
+        fmt.Println("Error:", err)
+        return ""
+    }
+
+    defer resp.Body.Close()
+
+    body1, err := ioutil.ReadAll(resp.Body)
+    return string(body1)
+}
+
 func main() {
     start := time.Now()
 
@@ -113,15 +153,34 @@ func main() {
     elapsed := time.Since(start)
     fmt.Println("Concurrent took time:", elapsed)
 
+    // Sequential
+
+    var m1 map[int]string
+    m1 = make(map[int]string)
+
+    start1 := time.Now()
+    for i := 5000000; i < 5000000 + numBlocks; i++ {
+        m1[i] = getBlock(i)
+    }
+    elapsed1 := time.Since(start1) 
+
+    fmt.Println("Sequential took time:", elapsed1)
+
     for k, v := range m {
-        print(k)
-        if v == "" {
-            fmt.Printf("key[%s] value[%s]\n", k, v)
+        if m1[k] != v {
+            fmt.Printf("Ah, differ at block", k)
         }
     }
-    //fmt.Println("map:", m)
-
     
+    for k, v := range m1 {
+        if m[k] != v {
+            fmt.Printf("Ah, differ at block", k)
+        }
+    }
+
+
+
+    //fmt.Println("Nonconcurrent took time:", elapsed1)
 
 
 
