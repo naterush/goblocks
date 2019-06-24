@@ -119,7 +119,7 @@ func main() {
     res := make(chan Result)
 
     // Make 500 dedicated block processors
-    for i := 0; i < 500; i++ {
+    for i := 0; i < 1000; i++ {
         go blockProcessor(blocks, res)
     }
 
@@ -128,6 +128,7 @@ func main() {
     m = make(map[int]string)
     var wg sync.WaitGroup
     wg.Add(1)
+
     go func () {
         numReceived := 0
     
