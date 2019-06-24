@@ -5,7 +5,7 @@ import (
     "net/http"
     "encoding/json"
     "bytes"
-    //"io/ioutil"
+    "io/ioutil"
     "time"
     "sync"
 )
@@ -58,9 +58,9 @@ func getBlock(block int, concurrent bool) {
 
     defer resp.Body.Close()
 
-    //body1, err := ioutil.ReadAll(resp.Body)
+    body1, err := ioutil.ReadAll(resp.Body)
 
-    //fmt.Println(string(body1))
+    fmt.Println(string(body1))
 }
 
 var waitgroup sync.WaitGroup
@@ -77,13 +77,13 @@ func main() {
     waitgroup.Wait()
     elapsed := time.Since(start)
 
-    fmt.Println("Concurrent took time:", elapsed)
 
-    start = time.Now()
+    start1 := time.Now()
     for i := 5000000; i < 5000000 + numBlocks; i++ {
         getBlock(i, false)    
     }
-    elapsed = time.Since(start)
+    elapsed1 := time.Since(start1)
 
-    fmt.Println("Nonconcurrent took time:", elapsed)
+    fmt.Println("Concurrent took time:", elapsed)
+    fmt.Println("Nonconcurrent took time:", elapsed1)
 }
