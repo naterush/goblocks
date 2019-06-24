@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net"
 	"bufio"
+	"time"
 )
 
 
@@ -65,20 +66,27 @@ func getBlock(block int) string {
 }
 
 func main() {
+	start := time.Now()
+
 	conn, err := net.Dial("unix", "/home/jrush/.local/share/io.parity.ethereum/jsonrpc.ipc")
 	if err != nil {
 		fmt.Println("Errror", err)
 	}
-	fmt.Println("Connection:", conn)
 
-	req := "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getBlockByNumber\", \"params\": [\"0x4C4B40\", false], \"id\": 100}\n"
-	fmt.Println("Request:", req)
+	for i := 0; i < 10000; i++ {
+		req := "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getBlockByNumber\", \"params\": [\"0x4C4B40\", false], \"id\": 100}\n"
+		fmt.Println("Request:", req)
 
-	conn.Write([]byte(req))
-	status, err := bufio.NewReader(conn).ReadString('\n')
-	if err != nil {
-		fmt.Println("Errror", err)
+		conn.Write([]byte(req))
+		status, err := bufio.NewReader(conn).ReadString('\n')
+		if err != nil {
+			fmt.Println("Errror", err)
+		}
+
+		fmt.Println("HERE", status)
 	}
 
-	fmt.Println("HERE", status)
+	elapsed := time.Since(start)
+    fmt.Println("Took time:", elapsed)
+	
 }
