@@ -100,10 +100,10 @@ func main() {
     start := time.Now()
     concurrentRPC()
     elapsed := time.Since(start)
-    fmt.Println("Concurrent RPC took:", elapsed)
+    fmt.Println("Concurrent http took:", elapsed)
 
     start = time.Now()
     sequentialRPC()
     elapsed = time.Since(start)
-    fmt.Println("Sequential RPC took:", elapsed)
+    fmt.Println("Sequential http took:", elapsed)
 }
