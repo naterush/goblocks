@@ -2,10 +2,6 @@ package main
 
 import (
     "fmt"
-    "net/http"
-    "encoding/json"
-    "bytes"
-	"io/ioutil"
 	"net"
 	"bufio"
 	"time"
@@ -33,4 +29,7 @@ func main() {
 	for i := 0; i < 100000; i++ {
 		getBlock(conn)
 	}
+	elapsed := time.Since(start)
+    fmt.Println("Singular ipc took:", elapsed)
+
 }
