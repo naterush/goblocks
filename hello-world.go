@@ -111,6 +111,9 @@ func main() {
 
     elapsed := time.Since(start)
     fmt.Println("Concurrent took time:", elapsed)
+    fmt.Println("map:", m)
+
+    
 
 
 
