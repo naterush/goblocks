@@ -21,6 +21,7 @@ type Payload struct {
 }
 
 func getBlock(block int) {
+    defer waitgroup.Done()
     hexBlockNum := fmt.Sprintf("0x%x", block)
 
     data := Payload{
@@ -32,6 +33,7 @@ func getBlock(block int) {
 
     payloadBytes, err := json.Marshal(data)
     if err != nil {
+        fmt.Println(block)
         return
     }
 
@@ -39,6 +41,7 @@ func getBlock(block int) {
 
     req, err := http.NewRequest("POST", "http://localhost:8545", body)
     if err != nil {
+        fmt.Println(block)
         return 
     }
     req.Header.Set("Content-Type", "application/json")
@@ -46,6 +49,7 @@ func getBlock(block int) {
     resp, err := http.DefaultClient.Do(req)
 
     if err != nil {
+        fmt.Println(block)
         return
     }
 
@@ -54,17 +58,17 @@ func getBlock(block int) {
     //body1, err := ioutil.ReadAll(resp.Body)
 
     //fmt.Println(string(body1))
-    fmt.Println(block)
-    waitgroup.Done()
 }
 
 var waitgroup sync.WaitGroup
 
 
 func main() {
+    numBlocks := 0
+
     start := time.Now()
-    waitgroup.Add(5005000 - 5000000 - 1)
-    for i := 5000000; i < 5005000; i++ {
+    waitgroup.Add(numBlocks)
+    for i := 5000000; i < 5000000 + numBlocks; i++ {
         go getBlock(i)    
     }
     elapsed := time.Since(start)
