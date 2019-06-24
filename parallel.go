@@ -57,12 +57,12 @@ func blockProcessor(blocks chan int) {
             fmt.Println("Error:", err)
             return
         }
-        resp.Body.Close()
 
         _, err = ioutil.ReadAll(resp.Body)
         if err != nil {
             fmt.Printf("Error", err)
         }
+        resp.Body.Close()
 
     }
 }
