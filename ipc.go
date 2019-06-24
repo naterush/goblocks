@@ -8,7 +8,7 @@ import (
 )
 
 func getBlock(conn net.Conn, blocks chan int) {
-	for block := range blocks {
+	for _ = range blocks {
 		req := "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getBlockByNumber\", \"params\": [\"0x4C4B40\", false], \"id\": 100}\n"
 
 		conn.Write([]byte(req))
