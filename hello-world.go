@@ -21,8 +21,8 @@ type Payload struct {
 }
 
 type Result struct {
-    block int,
-    body string,
+    block int
+    body string
 }
 
 func getBlock(block int, res chan Result) {
@@ -61,33 +61,19 @@ func getBlock(block int, res chan Result) {
     defer resp.Body.Close()
 
     body1, err := ioutil.ReadAll(resp.Body)
-    res <- Result{block, body1}
+    res <- Result{block, string(body1)}
 
     fmt.Println(string(body1))
-}
-
-func recevier(numBlocks int, res chan Result) map[int]string {
-    numReceived = 0
-    m = make(map[int]string)
-
-    for res := range res {
-        m[res.block] = res.body
-
-        numReceived = numReceived + 1
-        if numReceived == numBlocks {
-            return m
-        }
-    }
 }
 
 func main() {
     start := time.Now()
 
     numBlocks := 50000
-    res = make(chan Result)
+    res := make(chan Result)
 
     for i := 5000000; i < 5000000 + numBlocks; i++ {
-        go getBlock(i, true)    
+        go getBlock(i, res)    
     }
 
     var m map[int]string
@@ -96,7 +82,7 @@ func main() {
 	wg.Add(1)
 
     go func () {
-        numReceived = 0
+        numReceived := 0
     
         for res := range res {
             m[res.block] = res.body
@@ -107,10 +93,11 @@ func main() {
             }
         }
     }()
-    wg.wait()
+    wg.Wait()
 
     elapsed := time.Since(start)
     fmt.Println("Concurrent took time:", elapsed)
+    fmt.Println(m)
 
 
 
