@@ -73,7 +73,7 @@ func main() {
     blocks := make(chan int)
 
     // Make 500 dedicated block processors
-    for i := 0; i < 500; i++ {
+    for i := 0; i < 100; i++ {
         go blockProcessor(blocks)
     }
 
@@ -81,7 +81,6 @@ func main() {
     for i := 0; i < 100000; i++ {
         blocks <- 5000000
     }
-
 
     elapsed := time.Since(start)
     fmt.Println("Parallel RPC took:", elapsed)
