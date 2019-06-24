@@ -5,7 +5,7 @@ import (
     "net/http"
     "encoding/json"
     "bytes"
-    //"io/ioutil"
+    "io/ioutil"
     "time"
     "sync"
 )
@@ -55,9 +55,9 @@ func getBlock(block int) {
 
     defer resp.Body.Close()
 
-    //body1, err := ioutil.ReadAll(resp.Body)
+    body1, err := ioutil.ReadAll(resp.Body)
 
-    //fmt.Println(string(body1))
+    fmt.Println(string(body1))
 }
 
 var waitgroup sync.WaitGroup
