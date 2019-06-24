@@ -10,19 +10,7 @@ import (
 )
 
 
-type Params []interface{}
 
-type Payload struct {
-    Jsonrpc string        `json:"jsonrpc"`
-    Method  string        `json:"method"`
-    Params                `json:"params"`
-    ID      int           `json:"id"`
-}
-
-type Result struct {
-    block int
-    body string
-}
 
 func traceProcessor(blocks chan int) {
     // Process blocks untill the blocks channel closes
@@ -132,7 +120,7 @@ func sequentialHTTP() {
     }
 
     // Send the blocks to be processed
-    for i := 0; i < 50; i++ {
+    for i := 0; i < 2; i++ {
         blocks <- 5000000
     }
 }
