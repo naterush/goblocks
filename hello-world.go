@@ -21,7 +21,7 @@ type Payload struct {
 }
 
 func getBlock(block int) {
-    defer waitgroup.Done()
+    //defer waitgroup.Done()
     hexBlockNum := fmt.Sprintf("0x%x", block)
 
     data := Payload{
