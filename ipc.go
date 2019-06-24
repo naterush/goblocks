@@ -7,6 +7,7 @@ import (
     "bytes"
 	"io/ioutil"
 	"net"
+	"bufio"
 )
 
 
@@ -70,8 +71,7 @@ func main() {
 	}
 	fmt.Println("Connection:", conn)
 
-	req := fmt.Sprintf("{\"jsonrpc\": \"2.0\", \"method\": \"eth_getBlockByNumber\", \"params\"
-		: [0x%x, false], \"id\": 100}", 5000000)
+	req := "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getBlockByNumber\", \"params\": [0x4C4B40, false], \"id\": 100}"
 	fmt.Println("Request:", req)
 
 
