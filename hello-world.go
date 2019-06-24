@@ -64,7 +64,7 @@ var waitgroup sync.WaitGroup
 
 
 func main() {
-    numBlocks := 0
+    numBlocks := 1000
 
     start := time.Now()
     waitgroup.Add(numBlocks)
