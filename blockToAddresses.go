@@ -24,6 +24,49 @@ type Result struct {
     body string
 }
 
+func traceProcessor(blocks chan int) {
+    // Process blocks untill the blocks channel closes
+    for block := range blocks {
+        hexBlockNum := fmt.Sprintf("0x%x", block)
+
+        data := Payload{
+            "2.0",
+            "trace_block",
+            Params{hexBlockNum},
+            2,
+        }
+    
+        payloadBytes, err := json.Marshal(data)
+        if err != nil {
+            fmt.Println("Error:", err)
+            return
+        }
+    
+        body := bytes.NewReader(payloadBytes)
+    
+        req, err := http.NewRequest("POST", "http://localhost:8545", body)
+        if err != nil {
+            fmt.Println("Error:", err)
+            return 
+        }
+        req.Header.Set("Content-Type", "application/json")
+    
+        resp, err := http.DefaultClient.Do(req)
+    
+        if err != nil {
+            fmt.Println("Error:", err)
+            return
+        }
+
+        body1, err := ioutil.ReadAll(resp.Body)
+        if err != nil {
+            fmt.Printf("Error", err)
+        }
+        resp.Body.Close()
+        fmt.Println(body1)
+    }
+}
+
 
 func blockProcessor(blocks chan int) {
     // Process blocks untill the blocks channel closes
@@ -64,7 +107,6 @@ func blockProcessor(blocks chan int) {
             fmt.Printf("Error", err)
         }
         resp.Body.Close()
-
     }
 }
 
@@ -87,24 +129,39 @@ func sequentialHTTP() {
 
     // Only make one block processor
     for i := 0; i < 1; i++ {
-        go blockProcessor(blocks)
+        go traceProcessor(blocks)
     }
 
     // Send the blocks to be processed
-    for i := 0; i < 100000; i++ {
+    for i := 0; i < 1; i++ {
         blocks <- 5000000
     }
 }
 
 
 func main() {
-    start := time.Now()
-    concurrentHTTP()
-    elapsed := time.Since(start)
-    fmt.Println("Concurrent http took:", elapsed)
+    //start := time.Now()
+    //concurrentHTTP()
+    //elapsed := time.Since(start)
+    //fmt.Println("Concurrent http took:", elapsed)
 
-    start = time.Now()
+    start := time.Now()
     sequentialHTTP()
-    elapsed = time.Since(start)
+    elapsed := time.Since(start)
     fmt.Println("Sequential http took:", elapsed)
 }
+
+// Make 100 trace processors
+
+// Send each processor a range of blocks to request the traces for
+// Request that range of traces
+    // Get all the accounts out of there
+    // But also get all the transaction hashes, and then request those
+
+
+
+// Make 500 "processors," each that watch a block channel
+
+// When they receive a block:
+    // Get the number of transactions in that block
+    // Get the 

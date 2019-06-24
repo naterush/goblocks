@@ -66,5 +66,4 @@ func main() {
 	sequentialHTTP()
 	elapsed = time.Since(start)
     fmt.Println("Sequential ipc took:", elapsed)
-
 }
