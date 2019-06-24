@@ -113,7 +113,7 @@ func main() {
     start := time.Now()
 
     // Number of blocks to process
-    numBlocks := 50000
+    numBlocks := 1000000
 
     var blocks chan int
     blocks = make(chan int)
