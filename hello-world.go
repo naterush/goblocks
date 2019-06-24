@@ -119,7 +119,7 @@ func main() {
     res := make(chan Result)
 
     // Make 500 dedicated block processors
-    for i := 0; i < 1000; i++ {
+    for i := 0; i < 500; i++ {
         go blockProcessor(blocks, res)
     }
 
