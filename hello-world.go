@@ -169,12 +169,18 @@ func main() {
     fmt.Println("Created maps of", len(m), len(m1))
 
     for k, v := range m {
+        if v == "" {
+            fmt.Printf("empty block", k)
+        }
         if m1[k] != v {
             fmt.Printf("Ah, differ at block", k)
         }
     }
     
     for k, v := range m1 {
+        if v == "" {
+            fmt.Printf("empty block", k)
+        }
         if m[k] != v {
             fmt.Printf("Ah, differ at block", k)
         }
