@@ -81,7 +81,7 @@ func main() {
     res := make(chan Result)
 
     // Make 500 dedicated block processors
-    for i := 0; i < 100; i++ {
+    for i := 0; i < 500; i++ {
         go blockProcessor(blocks, res)
     }
 
@@ -103,6 +103,7 @@ func main() {
         }
     }()
 
+    // Send the blocks to be processed
     for i := 5000000; i < 5000000 + numBlocks; i++ {
         blocks <- i
     }
@@ -111,7 +112,7 @@ func main() {
 
     elapsed := time.Since(start)
     fmt.Println("Concurrent took time:", elapsed)
-    fmt.Println("map:", m)
+    //fmt.Println("map:", m)
 
     
 
