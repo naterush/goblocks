@@ -67,7 +67,7 @@ func blockProcessor(blocks chan int) {
     }
 }
 
-func concurrentRPC() {
+func concurrentHTTP() {
     blocks := make(chan int)
 
     // Make 250 block processors
@@ -81,7 +81,7 @@ func concurrentRPC() {
     }
 }
 
-func sequentialRPC() {
+func sequentialHTTP() {
     blocks := make(chan int)
 
     // Only make one block processor
@@ -98,12 +98,12 @@ func sequentialRPC() {
 
 func main() {
     start := time.Now()
-    concurrentRPC()
+    concurrentHTTP()
     elapsed := time.Since(start)
     fmt.Println("Concurrent http took:", elapsed)
 
     start = time.Now()
-    sequentialRPC()
+    sequentialHTTP()
     elapsed = time.Since(start)
     fmt.Println("Sequential http took:", elapsed)
 }
