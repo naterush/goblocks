@@ -20,10 +20,12 @@ type Payload struct {
     ID      int           `json:"id"`
 }
 
-func getBlock(block int, concurrent bool) {
-    if concurrent {
-        defer waitgroup.Done()
-    }
+type Result struct {
+    block int,
+    body string,
+}
+
+func getBlock(block int, res chan Result) {
 
     hexBlockNum := fmt.Sprintf("0x%x", block)
 
@@ -59,33 +61,65 @@ func getBlock(block int, concurrent bool) {
     defer resp.Body.Close()
 
     body1, err := ioutil.ReadAll(resp.Body)
+    res <- Result{block, body1}
 
     fmt.Println(string(body1))
 }
 
-var waitgroup sync.WaitGroup
+func recevier(numBlocks int, res chan Result) map[int]string {
+    numReceived = 0
+    m = make(map[int]string)
 
+    for res := range res {
+        m[res.block] = res.body
+
+        numReceived = numReceived + 1
+        if numReceived == numBlocks {
+            return m
+        }
+    }
+}
 
 func main() {
-    numBlocks := 50000
-
     start := time.Now()
-    waitgroup.Add(numBlocks)
+
+    numBlocks := 50000
+    res = make(chan Result)
+
     for i := 5000000; i < 5000000 + numBlocks; i++ {
         go getBlock(i, true)    
     }
-    waitgroup.Wait()
+
+    var m map[int]string
+    m = make(map[int]string)
+    var wg sync.WaitGroup
+	wg.Add(1)
+
+    go func () {
+        numReceived = 0
+    
+        for res := range res {
+            m[res.block] = res.body
+    
+            numReceived = numReceived + 1
+            if numReceived == numBlocks {
+                wg.Done()
+            }
+        }
+    }()
+    wg.wait()
+
     elapsed := time.Since(start)
+    fmt.Println("Concurrent took time:", elapsed)
 
-    return
 
 
+    /*
     start1 := time.Now()
     for i := 5000000; i < 5000000 + numBlocks; i++ {
         getBlock(i, false)    
     }
-    elapsed1 := time.Since(start1)
+    elapsed1 := time.Since(start1) */
 
-    fmt.Println("Concurrent took time:", elapsed)
-    fmt.Println("Nonconcurrent took time:", elapsed1)
+    //fmt.Println("Nonconcurrent took time:", elapsed1)
 }
