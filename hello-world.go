@@ -69,6 +69,7 @@ func main() {
     start := time.Now()
     waitgroup.Add(numBlocks)
     for i := 5000000; i < 5000000 + numBlocks; i++ {
+        print("running", i)
         go getBlock(i)    
     }
     elapsed := time.Since(start)
