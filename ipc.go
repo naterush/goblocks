@@ -73,7 +73,7 @@ func main() {
 		fmt.Println("Error", err)
 	}
 
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < 100000; i++ {
 		req := "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getBlockByNumber\", \"params\": [\"0x4C4B40\", false], \"id\": 100}\n"
 
 		conn.Write([]byte(req))
@@ -88,7 +88,7 @@ func main() {
 
 	start1 := time.Now()
 	
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < 100000; i++ {
 		getBlock(5000000)
 	}
 	
