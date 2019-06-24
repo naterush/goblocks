@@ -77,6 +77,8 @@ func main() {
     waitgroup.Wait()
     elapsed := time.Since(start)
 
+    return
+
 
     start1 := time.Now()
     for i := 5000000; i < 5000000 + numBlocks; i++ {
