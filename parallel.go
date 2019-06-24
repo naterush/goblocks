@@ -67,11 +67,24 @@ func blockProcessor(blocks chan int) {
     }
 }
 
-func main() {
-    start := time.Now()
-
+func concurrentRPC() {
     blocks := make(chan int)
 
+    // Make 250 block processors
+    for i := 0; i < 250; i++ {
+        go blockProcessor(blocks)
+    }
+
+    // Send the blocks to be processed
+    for i := 0; i < 100000; i++ {
+        blocks <- 5000000
+    }
+}
+
+func sequentialRPC() {
+    blocks := make(chan int)
+
+    // Only make one block processor
     for i := 0; i < 1; i++ {
         go blockProcessor(blocks)
     }
@@ -80,7 +93,17 @@ func main() {
     for i := 0; i < 100000; i++ {
         blocks <- 5000000
     }
+}
 
+
+func main() {
+    start := time.Now()
+    concurrentRPC()
     elapsed := time.Since(start)
-    fmt.Println("Parallel RPC took:", elapsed)
+    fmt.Println("Concurrent RPC took:", elapsed)
+
+    start = time.Now()
+    sequentialRPC()
+    elapsed = time.Since(start)
+    fmt.Println("Sequential RPC took:", elapsed)
 }
