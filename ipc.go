@@ -71,7 +71,7 @@ func main() {
 	}
 	fmt.Println("Connection:", conn)
 
-	req := "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getBlockByNumber\", \"params\": [0x4C4B40, false], \"id\": 100}\n"
+	req := "{\"jsonrpc\": \"2.0\", \"method\": \"eth_getBlockByNumber\", \"params\": [\"0x4C4B40\", false], \"id\": 100}\n"
 	fmt.Println("Request:", req)
 
 	conn.Write([]byte(req))
