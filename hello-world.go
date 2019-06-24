@@ -54,7 +54,7 @@ func getBlock(block int, res chan Result) {
     resp, err := http.DefaultClient.Do(req)
 
     if err != nil {
-        fmt.Println(block)
+        fmt.Println("Error:", block)
         return
     }
 
