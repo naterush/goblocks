@@ -68,5 +68,18 @@ func main() {
 	if err != nil {
 		fmt.Println("Errror", err)
 	}
-	fmt.Println("HERE", conn)
+	fmt.Println("Connection:", conn)
+
+	req := fmt.Sprintf("{\"jsonrpc\": \"2.0\", \"method\": \"eth_getBlockByNumber\", \"params\"
+		: [0x%x, false], \"id\": 100}", 5000000)
+	fmt.Println("Request:", req)
+
+
+	fmt.Fprintf(conn, req)
+	status, err := bufio.NewReader(conn).ReadString('\n')
+	if err != nil {
+		fmt.Println("Errror", err)
+	}
+
+	fmt.Println("HERE", status)
 }
