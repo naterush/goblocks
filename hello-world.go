@@ -38,7 +38,7 @@ func getBlock(block int, res chan Result) {
 
     payloadBytes, err := json.Marshal(data)
     if err != nil {
-        fmt.Println("Error:", block)
+        fmt.Println("Error:", err)
         return
     }
 
@@ -46,7 +46,7 @@ func getBlock(block int, res chan Result) {
 
     req, err := http.NewRequest("POST", "http://localhost:8545", body)
     if err != nil {
-        fmt.Println("Error:", block)
+        fmt.Println("Error:", err)
         return 
     }
     req.Header.Set("Content-Type", "application/json")
@@ -54,7 +54,7 @@ func getBlock(block int, res chan Result) {
     resp, err := http.DefaultClient.Do(req)
 
     if err != nil {
-        fmt.Println("Error:", block)
+        fmt.Println("Error:", err)
         return
     }
 
