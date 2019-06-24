@@ -48,11 +48,6 @@ type BlockTraces struct {
 		TransactionHash     string        `json:"transactionHash"`
 		TransactionPosition int           `json:"transactionPosition"`
 		Type                string        `json:"type"`
-		Action              struct {
-			Author     string `json:"author"`
-			RewardType string `json:"rewardType"`
-			Value      string `json:"value"`
-		} `json:"action,omitempty"`
 	} `json:"result"`
 	ID int `json:"id"`
 }
