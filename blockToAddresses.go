@@ -62,7 +62,7 @@ func traceProcessor(blocks chan int) {
             fmt.Printf("Error", err)
         }
         resp.Body.Close()
-        fmt.Println(body1)
+        fmt.Println(string(body1))
     }
 }
 
