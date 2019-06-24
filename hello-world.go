@@ -63,7 +63,7 @@ func getBlock(block int, res chan Result) {
     body1, err := ioutil.ReadAll(resp.Body)
     res <- Result{block, string(body1)}
 
-    fmt.Println(string(body1))
+    //fmt.Println(string(body1))
 }
 
 func main() {
