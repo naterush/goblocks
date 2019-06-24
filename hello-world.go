@@ -62,7 +62,7 @@ var waitgroup sync.WaitGroup
 
 func main() {
     start := time.Now()
-    waitgroup.Add(5005000 - 5000000)
+    waitgroup.Add(5005000 - 5000000 - 1)
     for i := 5000000; i < 5005000; i++ {
         go getBlock(i)    
     }
