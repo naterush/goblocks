@@ -114,6 +114,7 @@ func main() {
     fmt.Println("Concurrent took time:", elapsed)
 
     for k, v := range m {
+        print(k)
         if v == "" {
             fmt.Printf("key[%s] value[%s]\n", k, v)
         }
