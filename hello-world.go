@@ -166,7 +166,7 @@ func main() {
 
     fmt.Println("Sequential took time:", elapsed1)
 
-    fmt.Println("Created maps of %d and %d", len(m), len(m1))
+    fmt.Println("Created maps of", len(m), len(m1))
 
     for k, v := range m {
         if m1[k] != v {
