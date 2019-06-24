@@ -67,11 +67,11 @@ func main() {
     numBlocks := 1000
 
     start := time.Now()
-    waitgroup.Add(numBlocks)
+    //waitgroup.Add(numBlocks)
     for i := 5000000; i < 5000000 + numBlocks; i++ {
-        go getBlock(i)    
+        getBlock(i)    
     }
-    waitgroup.Wait()
+    //waitgroup.Wait()
     elapsed := time.Since(start)
 
     fmt.Println("Took time:", elapsed)
