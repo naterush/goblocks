@@ -5,7 +5,7 @@ import (
     "net/http"
     "encoding/json"
     "bytes"
-    "io/ioutil"
+    //"io/ioutil"
     "time"
     "sync"
 )
@@ -20,8 +20,11 @@ type Payload struct {
     ID      int           `json:"id"`
 }
 
-func getBlock(block int) {
-    //defer waitgroup.Done()
+func getBlock(block int, concurrent bool) {
+    if concurrent {
+        defer waitgroup.Done()
+    }
+
     hexBlockNum := fmt.Sprintf("0x%x", block)
 
     data := Payload{
@@ -55,9 +58,9 @@ func getBlock(block int) {
 
     defer resp.Body.Close()
 
-    body1, err := ioutil.ReadAll(resp.Body)
+    //body1, err := ioutil.ReadAll(resp.Body)
 
-    fmt.Println(string(body1))
+    //fmt.Println(string(body1))
 }
 
 var waitgroup sync.WaitGroup
@@ -67,12 +70,20 @@ func main() {
     numBlocks := 1000
 
     start := time.Now()
-    //waitgroup.Add(numBlocks)
+    waitgroup.Add(numBlocks)
     for i := 5000000; i < 5000000 + numBlocks; i++ {
-        getBlock(i)    
+        go getBlock(i, true)    
     }
-    //waitgroup.Wait()
+    waitgroup.Wait()
     elapsed := time.Since(start)
 
-    fmt.Println("Took time:", elapsed)
+    fmt.Println("Concurrent took time:", elapsed)
+
+    start = time.Now()
+    for i := 5000000; i < 5000000 + numBlocks; i++ {
+        getBlock(i, true)    
+    }
+    elapsed = time.Since(start)
+
+    fmt.Println("Nonconcurrent took time:", elapsed)
 }
