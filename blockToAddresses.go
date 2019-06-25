@@ -200,7 +200,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                 addr := string(logs.Result[i].Topics[j][2:])
                 if (isPotentialAddress(addr)) {
                     addresses["0x" + string(addr[24:]) + blockAndIdx] = true
-                    fmt.Println("Adding address", addr)
+                    //fmt.Println("Adding address", addr)
                 }
             }
         }
@@ -339,7 +339,7 @@ func main() {
     //testSearch()
     
     startBlock := 7100251
-    numBlocks := 1 //7101521 - 7100251
+    numBlocks := 7101521 - 7100251
 
     blocks := make(chan int)
     traceAndLogs := make(chan TraceAndLogs)
