@@ -332,7 +332,6 @@ func writeAddresses(blockNum string, addresses map[string]bool) {
     folderPath := "blocks/" + string(blockNum[:3]) + "/" + string(blockNum[4:7])
 
     if _, err := os.Stat(folderPath); os.IsNotExist(err) {
-        fmt.Println("HEREHERHE")
         os.MkdirAll(folderPath, os.ModePerm)
     }
 
@@ -414,8 +413,8 @@ func testSearch() {
 func main() {
     //testSearch()
     
-    startBlock := 5030000
-    numBlocks := 1
+    startBlock := 5000000
+    numBlocks := 250000
 
     blocks := make(chan int)
     traceAndLogs := make(chan TraceAndLogs)
