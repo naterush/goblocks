@@ -112,7 +112,6 @@ func getAddress(traces chan []byte) {
 	    	fmt.Println("error:", err)
         }
         addresses := make(map[string]bool)
-        fmt.Println(string(blockTraces))
         fmt.Println("Now processing block", traces.Result[0].BlockNumber)
 
         // Format block number, so it's 9 digits total
