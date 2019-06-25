@@ -196,7 +196,7 @@ func main() {
         go getAddress(traces)
     }
 
-    for block := 5000000; block < 5000000 + numBlocks; block++ {
+    for block := 2675000 - 10000; block < 2675000; block++ {
         blocks <- block
     }
     
