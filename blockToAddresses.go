@@ -314,7 +314,7 @@ func getLogAddresses(addresses map[string]bool, logs *BlockLogs, blockNum string
 }
 
 func writeAddress(blockNum string, addresses map[string]bool) {
-    os.MkdirAll(folderPath, os.ModePerm)
+    //os.MkdirAll(folderPath, os.ModePerm)
 
     addressArray := make([]string, len(addresses))
     idx := 0
@@ -326,7 +326,7 @@ func writeAddress(blockNum string, addresses map[string]bool) {
     toWrite := []byte(strings.Join(addressArray[:], "\n") + "\n")
 
     fileName := "block/" + blockNum + ".txt"
-    err = ioutil.WriteFile(fileName, toWrite, 0777)
+    err := ioutil.WriteFile(fileName, toWrite, 0777)
     if err != nil {
         fmt.Println("Error writing file:", err)
     }
