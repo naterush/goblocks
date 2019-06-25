@@ -164,7 +164,6 @@ func getTrace(blocks chan int, traces chan []byte, readDone chan int) {
             fmt.Printf("Error", err)
         }
         resp.Body.Close()
-        fmt.Println(string(body1))
         
         fmt.Println("Read in block and now sending", block)
         traces <- body1
