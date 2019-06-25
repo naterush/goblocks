@@ -11,8 +11,6 @@ import (
     "strconv"
 )
 
-
-
 type Params []interface{}
 
 type Payload struct {
@@ -84,6 +82,8 @@ func getAddress(traces chan []byte) {
         for i :=0; i < len(traces.Result); i++ {
             idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
             blockAndIdx := "\t" + blockNum + "\t" + idx
+            // TODO: Try to read input data, no matter what
+
             if traces.Result[i].Type == "call" {
                 // If it's a call, get the to and from
                 from := traces.Result[i].Action.From
@@ -181,7 +181,7 @@ func getTrace(blocks chan int, traces chan []byte) {
 }
 
 func main() {
-    numBlocks := 100000
+    numBlocks := 10
 
     done := make(chan int)
     blocks := make(chan int)
@@ -196,7 +196,7 @@ func main() {
         go getAddress(traces)
     }
 
-    for block := 2675000 - numBlocks; block < 2675000; block++ {
+    for block := 4500100; block < 4500100 + numBlocks; block++ {
         blocks <- block
     }
     
