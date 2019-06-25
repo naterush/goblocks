@@ -79,8 +79,6 @@ func searchForAddress(address string, blocks chan int, ) {
 } */
 
 func isPotentialAddress(addr string) bool {
-    fmt.Println("Is potential address:", addr)
-
     small := "00000000000000000000000000000000000000ffffffffffffffffffffffffff"
     large := "0000000000000000000000010000000000000000000000000000000000000000"
 
@@ -221,7 +219,7 @@ func getTrace(blocks chan int, traces chan []byte) {
 
 func main() {
     startBlock := 2608034
-    numBlocks := 1
+    numBlocks := 10000
 
     blocks := make(chan int)
     traces := make(chan []byte)
