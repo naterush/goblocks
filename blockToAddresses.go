@@ -9,6 +9,7 @@ import (
     "sort"
     "strings"
     "strconv"
+    "time"
 )
 
 
@@ -166,7 +167,7 @@ func getTrace(blocks chan int, traces chan []byte) {
 }
 
 func main() {
-    numBlocks := 10000
+    numBlocks := 1000
 
     done := make(chan int)
     blocks := make(chan int)
