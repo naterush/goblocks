@@ -415,7 +415,7 @@ func main() {
     //testSearch()
     
     startBlock := 5030000
-    numBlocks := 10000
+    numBlocks := 1
 
     blocks := make(chan int)
     traceAndLogs := make(chan TraceAndLogs)
