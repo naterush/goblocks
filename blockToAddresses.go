@@ -329,7 +329,7 @@ func writeAddresses(blockNum string, addresses map[string]bool) {
         // path/to/whatever does not exist
     }
 
-    folderPath := "blocks/" + string(blockNum[:3]) + "/" + string(blockNum[4:7])
+    folderPath := "blocks/" + string(blockNum[:3]) + "/" + string(blockNum[3:6])
 
     if _, err := os.Stat(folderPath); os.IsNotExist(err) {
         os.MkdirAll(folderPath, os.ModePerm)
