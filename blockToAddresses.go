@@ -60,6 +60,15 @@ type BlockTraces struct {
 	ID int `json:"id"`
 }
 
+func leftZero(str string, totalLen int) string {
+    // Assume len(str) < totalLen
+    zeros := ""
+    for i :=0 ; i < totalLen - len(str); i++ {
+        zeros += "0"
+    }
+    return zeros + str
+}
+
 func getAddress(traces chan []byte) {
     for blockTraces := range traces {
         var traces BlockTraces
@@ -70,29 +79,33 @@ func getAddress(traces chan []byte) {
         addresses := make(map[string]bool)
         fmt.Println("Now processing block", traces.Result[0].BlockNumber)
 
-        for i :=0; i<len(traces.Result); i++ {
+        // Format block number, so it's 9 digits total
+        blockNum := leftZero(strconv.Itoa(traces.Result[0].BlockNumber), 9)
+        for i :=0; i < len(traces.Result); i++ {
+            idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
+            blockAndIdx := "\t" + blockNum + "\t" + idx
             if traces.Result[i].Type == "call" {
                 // If it's a call, get the to and from
                 from := traces.Result[i].Action.From
                 to := traces.Result[i].Action.To
-                addresses[from] = true
-                addresses[to] = true
+                addresses[from + blockAndIdx] = true
+                addresses[to + blockAndIdx] = true
             } else if traces.Result[i].Type == "reward" {
                 // if it's a reward, add the miner
                 author := traces.Result[i].Action.Author
-                addresses[author] = true
+                addresses[author + blockAndIdx] = true
             } else if traces.Result[i].Type == "suicide" {
                 // add the contract that died, and where it sent it's money
                 address := traces.Result[i].Action.Address
                 refundAddress := traces.Result[i].Action.RefundAddress
-                addresses[address] = true
-                addresses[refundAddress] = true
+                addresses[address + blockAndIdx] = true
+                addresses[refundAddress + blockAndIdx] = true
             } else if traces.Result[i].Type == "create" {
                 // add the creator, and the new address name
                 from := traces.Result[i].Action.From
                 address := traces.Result[i].Result.Address
-                addresses[from] = true
-                addresses[address] = true
+                addresses[from + blockAndIdx] = true
+                addresses[address + blockAndIdx] = true
             } else {
                 fmt.Println("New trace type:", string(blockTraces))
             }
@@ -112,7 +125,7 @@ func getAddress(traces chan []byte) {
 
         // write this array to a file
         // at least one result (as the miner got a reward)
-        fileName := "block/file" + strconv.Itoa(traces.Result[0].BlockNumber) + ".txt"
+        fileName := "block/" + blockNum + ".txt"
         err = ioutil.WriteFile(fileName, toWrite, 0777)
         if err != nil {
             fmt.Println("Error writing file:", err)
