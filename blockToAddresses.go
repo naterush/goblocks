@@ -75,7 +75,7 @@ type AddrSighting struct {
 
 func searchForAddress(address string, fileNames chan int, sightings chan AddrSighting) {
     for fileName := range fileNames {
-        data, err := ioutil.ReadFile("/tmp/dat")
+        data, err := ioutil.ReadFile("/tmp/" + fileName)
         if err != nil {
             fmt.Println("Error:", err)
         }
