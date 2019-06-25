@@ -74,7 +74,7 @@ func getAddress(traces chan []byte, done chan int) {
                 author := traces.Result[i].Action.Author
                 addresses[author] = true
             } else {
-                fmt.Println("New trace type:", traces.Result[i].Type)
+                fmt.Println("New trace type:", traces.Result[i])
             }
         }
 
