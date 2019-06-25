@@ -190,17 +190,19 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                 addresses[from + blockAndIdx] = true
                 addresses[address + blockAndIdx] = true
 
-                /*
-                if len(traces.Result[i].Action.Init) > 10 {
-                    initData := traces.Result[i].Action.Init[10:]
-                    for i := 0; i < len(initData) / 64; i++ {
-                        addr := string(initData[i * 64:(i + 1) * 64])
-                        if isPotentialAddress(addr) {
-                            addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                // If it's a top level trace, then the call data is the init, 
+                // so to match with quickblocks, we just parse init
+                if len(traces.Result[i].TraceAddress) == 0 {
+                    if len(traces.Result[i].Action.Init) > 10 {
+                        initData := traces.Result[i].Action.Init[10:]
+                        for i := 0; i < len(initData) / 64; i++ {
+                            addr := string(initData[i * 64:(i + 1) * 64])
+                            if isPotentialAddress(addr) {
+                                addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                            }
                         }
                     }
-                } */
-
+                }
 
 
             } else {
