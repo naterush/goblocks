@@ -166,12 +166,14 @@ func getTrace(blocks chan int, traces chan []byte) {
 }
 
 func main() {
+    numBlocks := 100
+
     done := make(chan int)
     blocks := make(chan int)
     traces := make(chan []byte)
 
     // make a bunch of block processors
-    for i := 0; i < 25; i++ {
+    for i := 0; i < 1; i++ {
         go getTrace(blocks, traces)
     }
 
@@ -179,7 +181,7 @@ func main() {
         go getAddress(traces)
     }
 
-    for block := 5000000; block < 5000000 + 1; block++ {
+    for block := 5000000; block < 5000000 + numBlocks; block++ {
         blocks <- block
     }
     
