@@ -81,7 +81,7 @@ func searchForAddress(address string, blocks chan int, ) {
 func isPotentialAddress(addr string) bool {
     fmt.Println("Checking for addr", addr)
 
-    small := "00000000000000ffffffffffffffffffffffffff"
+    small := "00000000000000000000000000000000000000ffffffffffffffffffffffffff"
     largePrefix := "000000000000000000000000"
 
     if addr <= small || !strings.HasPrefix(addr, largePrefix) {
