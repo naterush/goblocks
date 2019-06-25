@@ -116,6 +116,7 @@ func getAddress(traces chan []byte) {
             for i := 0; i < len(inputData) / 64; i++ {
                 addr := string(inputData[10 + i * 64:10 + (i + 1) * 64])
                 if isPotentialAddress(addr) {
+                    print("TRUE")
                     addresses[addr + blockAndIdx] = true
                 }
             }
