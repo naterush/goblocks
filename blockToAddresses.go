@@ -136,6 +136,8 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
 	    	fmt.Println("error:", err)
         }
         addresses := make(map[string]bool)
+        fmt.Println(string(blockTraceAndLog.Traces))
+        fmt.Println(string(blockTraceAndLog.Logs))
         fmt.Println("Now processing block", traces.Result[0].BlockNumber)
 
         // Format block number, so it's 9 digits total
@@ -387,7 +389,7 @@ func testSearch() {
 func main() {
     //testSearch()
     
-    startBlock := 71003624//7100251
+    startBlock := 71003624 //7100251
     numBlocks := 1//7101521 - 7100251
 
     blocks := make(chan int)
