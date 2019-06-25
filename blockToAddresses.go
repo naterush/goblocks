@@ -166,7 +166,7 @@ func getTrace(blocks chan int, traces chan []byte) {
 }
 
 func main() {
-    numBlocks := 100
+    numBlocks := 10000
 
     done := make(chan int)
     blocks := make(chan int)
