@@ -140,6 +140,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
 
         // Format block number, so it's 9 digits total
         blockNum := leftZero(strconv.Itoa(traces.Result[0].BlockNumber), 9)
+        hit := 0
         for i :=0; i < len(traces.Result); i++ {
             idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
             blockAndIdx := "\t" + blockNum + "\t" + idx
@@ -165,6 +166,11 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                 addresses[from + blockAndIdx] = true
                 addresses[to + blockAndIdx] = true
             } else if traces.Result[i].Type == "reward" {
+                hit++
+
+                if (hit > 1) {
+                    fmt.Println(string(blockTraceAndLog.Traces))
+                }
                 // if it's a reward, add the miner
                 author := traces.Result[i].Action.Author
                 addresses[author + "\t" + blockNum + "\t" + "99999"] = true
