@@ -66,6 +66,34 @@ func leftZero(str string, totalLen int) string {
     }
     return zeros + str
 }
+/*
+func searchForAddress(address string, blocks chan int, ) {
+    for block := range blocks {
+        // open block file
+        // binary search it
+        //
+
+
+    }
+
+} */
+
+func isPotentialAddress(addr string) bool {
+    fmt.Println("Is potential address:", addr)
+
+    small := "00000000000000ffffffffffffffffffffffffff"
+    large := "010000000000000000000000000000000000000000"
+
+    if addr <= small || addr >= large {
+        return false
+    }
+
+    if strings.HasSuffix(addr, "00000000") {
+        return false
+    }
+
+    return true
+}
 
 func getAddress(traces chan []byte) {
     for blockTraces := range traces {
@@ -82,7 +110,16 @@ func getAddress(traces chan []byte) {
         for i :=0; i < len(traces.Result); i++ {
             idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
             blockAndIdx := "\t" + blockNum + "\t" + idx
-            // TODO: Try to read input data, no matter what
+            // Try to get addresses from the input data
+            inputData := traces.Result[i].Action.Input
+            if inputData != "" {
+                for i := 0; i < (len(inputData) / 64) - 1; i++ {
+                    addr := string(inputData[i * 64:(i + 1) * 64])
+                    if isPotentialAddress(addr) {
+                        addresses[addr + blockAndIdx] = true
+                    }
+                }
+            }
 
             if traces.Result[i].Type == "call" {
                 // If it's a call, get the to and from
