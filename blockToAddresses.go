@@ -387,8 +387,8 @@ func testSearch() {
 func main() {
     //testSearch()
     
-    startBlock := 7100611//7100251
-    numBlocks := 1 //7101521 - 7100251
+    startBlock := 7100251
+    numBlocks := 7101521 - 7100251
 
     blocks := make(chan int)
     traceAndLogs := make(chan TraceAndLogs)
