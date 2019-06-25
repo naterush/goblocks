@@ -66,16 +66,22 @@ func leftZero(str string, totalLen int) string {
     }
     return zeros + str
 }
-/*
-func searchForAddress(address string, blocks chan int, ) {
-    for block := range blocks {
-        // open block file
-        // binary search it
-        //
+
+type AddrSighting struct {
+    block int
+    txIdx int
+}
 
 
+func searchForAddress(address string, fileNames chan int, sightings chan AddrSighting) {
+    for fileName := range fileNames {
+        data, err := ioutil.ReadFile("/tmp/dat")
+        if err != nil {
+            fmt.Println("Error:", err)
+        }
+        fmt.Print(string(data))
+        sightings <- AddrSighting{0, 0}
     }
-
 } */
 
 func isPotentialAddress(addr string) bool {
@@ -225,8 +231,8 @@ func getTrace(blocks chan int, traces chan []byte) {
 }
 
 func main() {
-    startBlock := 8028001
-    numBlocks := 8028299 - startBlock
+    startBlock := 6000000
+    numBlocks := 10000
 
     blocks := make(chan int)
     traces := make(chan []byte)
