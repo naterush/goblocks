@@ -389,7 +389,7 @@ func testSearch() {
 func main() {
     //testSearch()
     
-    startBlock := 71003624 //7100251
+    startBlock := 7100362 //7100251
     numBlocks := 1//7101521 - 7100251
 
     blocks := make(chan int)
