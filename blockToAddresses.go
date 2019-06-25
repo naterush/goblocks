@@ -142,7 +142,7 @@ func getAddress(traces chan []byte) {
             } else if traces.Result[i].Type == "reward" {
                 // if it's a reward, add the miner
                 author := traces.Result[i].Action.Author
-                addresses[author + blockAndIdx] = true
+                addresses[author + "\t" + blockNum + "\t" + "99999"] = true
             } else if traces.Result[i].Type == "suicide" {
                 // add the contract that died, and where it sent it's money
                 address := traces.Result[i].Action.Address
@@ -168,7 +168,7 @@ func getAddress(traces chan []byte) {
             idx++
         }
         sort.Strings(addressArray)
-        toWrite := []byte(strings.Join(addressArray[:], "\n"))
+        toWrite := []byte(strings.Join(addressArray[:], "\n") + "\n")
 
         // TODO: make this a seperate process
 
