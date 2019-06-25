@@ -85,13 +85,16 @@ func isPotentialAddress(addr string) bool {
     large := "010000000000000000000000000000000000000000"
 
     if addr <= small || addr >= large {
+        fmt.Println("False bc large or small", addr <= small, addr >= large)
         return false
     }
 
     if strings.HasSuffix(addr, "00000000") {
+        fmt.Println("False bc has suffix")
         return false
     }
 
+    fmt.Println("True!")
     return true
 }
 
@@ -116,7 +119,6 @@ func getAddress(traces chan []byte) {
             for i := 0; i < len(inputData) / 64; i++ {
                 addr := string(inputData[10 + i * 64:10 + (i + 1) * 64])
                 if isPotentialAddress(addr) {
-                    print("TRUE")
                     addresses[addr + blockAndIdx] = true
                 }
             }
