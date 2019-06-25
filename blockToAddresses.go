@@ -110,7 +110,7 @@ func getAddress(traces chan []byte) {
 
         // write this array to a file
         // at least one result (as the miner got a reward)
-        fileName := "file" + strconv.Itoa(traces.Result[0].BlockNumber) + ".txt"
+        fileName := "block/file" + strconv.Itoa(traces.Result[0].BlockNumber) + ".txt"
         err = ioutil.WriteFile(fileName, toWrite, 0777)
         if err != nil {
             fmt.Println("Error writing file:", err)
