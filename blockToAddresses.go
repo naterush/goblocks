@@ -58,6 +58,24 @@ type BlockTraces struct {
 	ID int `json:"id"`
 }
 
+type BlockLogs struct {
+	Jsonrpc string `json:"jsonrpc"`
+	Result  []struct {
+		Address             string   `json:"address"`
+		BlockHash           string   `json:"blockHash"`
+		BlockNumber         string   `json:"blockNumber"`
+		Data                string   `json:"data"`
+		LogIndex            string   `json:"logIndex"`
+		Removed             bool     `json:"removed"`
+		Topics              []string `json:"topics"`
+		TransactionHash     string   `json:"transactionHash"`
+		TransactionIndex    string   `json:"transactionIndex"`
+		TransactionLogIndex string   `json:"transactionLogIndex"`
+		Type                string   `json:"type"`
+	} `json:"result"`
+	ID int `json:"id"`
+}
+
 func leftZero(str string, totalLen int) string {
     // Assume len(str) < totalLen
     zeros := ""
@@ -164,7 +182,28 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
         }
 
         // Now, parse log data
-        fmt.Println("Logdata:", string(blockTraceAndLog.Logs))
+        var logs BlockLogs
+        err = json.Unmarshal(blockTraceAndLog.Logs, &logs)
+	    if err != nil {
+	    	fmt.Println("error:", err)
+        }
+
+        for i :=0; i < len(logs.Result); i++ {
+            idxInt, err := strconv.ParseInt(logs.Result[i].TransactionIndex, 0, 32)
+            if err != nil {
+                fmt.Println("Error:", err)
+            }
+            idx := leftZero(strconv.FormatInt(idxInt, 10), 5)
+            blockAndIdx := "\t" + blockNum + "\t" + idx
+            
+            for j := 0 ; j < len(logs.Result[i].Topics); j++ {
+                addr := string(logs.Result[i].Topics[j][2:])
+                if (isPotentialAddress(addr)) {
+                    addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                    fmt.Println("Adding address", addr)
+                }
+            }
+        }
 
         // create an array with all the addresses, and sort
         addressArray := make([]string, len(addresses))
