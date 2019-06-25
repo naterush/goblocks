@@ -13,17 +13,114 @@ import (
 
 type Params []interface{}
 
-type Payload struct {
+type JSONPayload struct {
     Jsonrpc string        `json:"jsonrpc"`
     Method  string        `json:"method"`
     Params                `json:"params"`
     ID      int           `json:"id"`
 }
 
+// Returns all traces for a given block
+func getTracesForBlock(blockNum int) ([]byte, error) {
+    hexBlockNum := fmt.Sprintf("0x%x", blockNum)
 
-type Result struct {
-    block int
-    body string
+    data := JSONPayload {
+        "2.0",
+        "trace_block",
+        Params{hexBlockNum},
+        2,
+    }
+
+    payloadBytes, err := json.Marshal(data)
+    if err != nil {
+        return nil, err
+    }
+
+    body := bytes.NewReader(payloadBytes)
+
+    req, err := http.NewRequest("POST", "http://localhost:8545", body)
+    if err != nil {
+        return nil, err
+    }
+    req.Header.Set("Content-Type", "application/json")
+
+    resp, err := http.DefaultClient.Do(req)
+    if err != nil {
+        return nil, err
+    }
+
+    tracesBody, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        return nil, err
+    }
+    defer resp.Body.Close()
+
+    return tracesBody, nil
+}
+
+type Filter struct {
+    Fromblock string        `json:"fromBlock"`
+    Toblock  string        `json:"toBlock"`
+}
+
+// Returns all logs for a given block
+func getLogsForBlock(blockNum int) ([]byte, error) {
+    hexBlockNum := fmt.Sprintf("0x%x", blockNum)
+
+    data := JSONPayload {
+        "2.0",
+        "eth_getLogs",
+        Params{Filter{hexBlockNum, hexBlockNum}},
+        2,
+    }
+
+    payloadBytes, err := json.Marshal(data)
+    if err != nil {
+        return nil, err
+    }
+
+    body := bytes.NewReader(payloadBytes)
+
+    req, err := http.NewRequest("POST", "http://localhost:8545", body)
+    if err != nil {
+        return nil, err
+    }
+    req.Header.Set("Content-Type", "application/json")
+
+    resp, err := http.DefaultClient.Do(req)
+
+    if err != nil {
+        return nil, err
+    }
+
+    logsBody, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        return nil, err
+    }
+    defer resp.Body.Close()
+
+    return logsBody, nil
+}
+
+type TraceAndLogs struct {
+    Traces []byte
+    Logs  []byte
+}
+
+func getTraceAndLogs(blocks chan int, traceAndLogs chan TraceAndLogs) {
+    // Get blocks received on the blocks channel
+    for blockNum := range blocks {
+        traces, err := getTracesForBlock(blockNum)
+        if err != nil {
+            panic(err)
+        }
+        logs, err := getLogsForBlock(blockNum) 
+        if err != nil {
+            panic(err)
+        }
+
+        traceAndLogs <- TraceAndLogs{traces, logs}
+    }
 }
 
 type BlockTraces struct {
@@ -86,6 +183,183 @@ func leftZero(str string, totalLen int) string {
     return zeros + str
 }
 
+func isPotentialAddress(addr string) bool {
+
+    small := "00000000000000000000000000000000000000ffffffffffffffffffffffffff"
+    largePrefix := "000000000000000000000000"
+
+    if addr <= small || !strings.HasPrefix(addr, largePrefix) {
+        return false
+    }
+
+    if strings.HasSuffix(addr, "00000000") {
+        return false
+    }
+
+    return true
+}
+
+func getTraceAddresses(addresses map[string]bool, traces *BlockTraces, blockNum string) {
+
+    for i :=0; i < len(traces.Result); i++ {
+        idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
+
+        blockAndIdx := "\t" + blockNum + "\t" + idx
+        // Try to get addresses from the input data
+        if len(traces.Result[i].Action.Input) > 10 {
+            inputData := traces.Result[i].Action.Input[10:]
+            //fmt.Println("Input data:", inputData, len(inputData))
+            for i := 0; i < len(inputData) / 64; i++ {
+                addr := string(inputData[i * 64:(i + 1) * 64])
+                if isPotentialAddress(addr) {
+                    addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                }
+            }
+        }
+        if traces.Result[i].Type == "call" {
+            // If it's a call, get the to and from
+            from := traces.Result[i].Action.From
+            to := traces.Result[i].Action.To
+            addresses[from + blockAndIdx] = true
+            addresses[to + blockAndIdx] = true
+        } else if traces.Result[i].Type == "reward" {
+            if traces.Result[i].Action.RewardType == "block" {
+                author := traces.Result[i].Action.Author
+                addresses[author + "\t" + blockNum + "\t" + "99999"] = true
+            } else if traces.Result[i].Action.RewardType == "uncle" {
+
+                //author := traces.Result[i].Action.Author
+                //addresses[author + "\t" + blockNum + "\t" + "99998"] = true
+            } else {
+                fmt.Println("New type of reward", traces.Result[i].Action.RewardType)
+            }
+        } else if traces.Result[i].Type == "suicide" {
+            // add the contract that died, and where it sent it's money
+            address := traces.Result[i].Action.Address
+            refundAddress := traces.Result[i].Action.RefundAddress
+            addresses[address + blockAndIdx] = true
+            addresses[refundAddress + blockAndIdx] = true
+        } else if traces.Result[i].Type == "create" {
+            // add the creator, and the new address name
+            from := traces.Result[i].Action.From
+            address := traces.Result[i].Result.Address
+            addresses[from + blockAndIdx] = true
+            addresses[address + blockAndIdx] = true
+
+            // If it's a top level trace, then the call data is the init, 
+            // so to match with quickblocks, we just parse init
+            if len(traces.Result[i].TraceAddress) == 0 {
+                if len(traces.Result[i].Action.Init) > 10 {
+                    initData := traces.Result[i].Action.Init[10:]
+                    for i := 0; i < len(initData) / 64; i++ {
+                        addr := string(initData[i * 64:(i + 1) * 64])
+                        if isPotentialAddress(addr) {
+                            addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                        }
+                    }
+                }
+            }
+
+            // How can we check if the contract creation has failed?
+            // If the contract throws during construction, then I don't get that address
+            // If this has failed, then I can get the 
+
+
+        } else {
+            fmt.Println("New trace type:", traces.Result[i].Type)
+        }
+
+        // Parse output of trace
+        if len(traces.Result[i].Result.Output) > 2 {
+            outputData := traces.Result[i].Result.Output[2:]
+            //fmt.Println("Input data:", inputData, len(inputData))
+            for i := 0; i < len(outputData) / 64; i++ {
+                addr := string(outputData[i * 64:(i + 1) * 64])
+                if isPotentialAddress(addr) {
+                    addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                }
+            }
+        }
+    }
+}
+
+func getLogAddresses(addresses map[string]bool, logs *BlockLogs, blockNum string) {
+
+    for i :=0; i < len(logs.Result); i++ {
+        idxInt, err := strconv.ParseInt(logs.Result[i].TransactionIndex, 0, 32)
+        if err != nil {
+            fmt.Println("Error:", err)
+        }
+        idx := leftZero(strconv.FormatInt(idxInt, 10), 5)
+
+        blockAndIdx := "\t" + blockNum + "\t" + idx
+        
+        for j := 0 ; j < len(logs.Result[i].Topics); j++ {
+            addr := string(logs.Result[i].Topics[j][2:])
+            if (isPotentialAddress(addr)) {
+                addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+            }
+        }
+
+        if len(logs.Result[i].Data) > 2 {
+            inputData := logs.Result[i].Data[2:]
+            for i := 0; i < len(inputData) / 64; i++ {
+                addr := string(inputData[i * 64:(i + 1) * 64])
+                if isPotentialAddress(addr) {
+                    addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                }
+            }
+        }
+    }
+}
+
+
+func getAddress(traceAndLogs chan TraceAndLogs) {
+    for blockTraceAndLog := range traceAndLogs {
+        fmt.Println("Beginning Block Processing...")     
+        // Set of 'address \t block \t txIdx'
+        addresses := make(map[string]bool)
+
+        // Parse the traces
+        var traces BlockTraces
+        err := json.Unmarshal(blockTraceAndLog.Traces, &traces)
+	    if err != nil {
+	    	panic(err)
+        }
+        blockNum := leftZero(strconv.Itoa(traces.Result[0].BlockNumber), 9)
+        getTraceAddresses(addresses, &traces, blockNum)
+
+        // Now, parse log data
+        var logs BlockLogs
+        err = json.Unmarshal(blockTraceAndLog.Logs, &logs)
+	    if err != nil {
+	    	panic(err)
+        }
+        getLogAddresses(addresses, &logs, blockNum)
+
+        // Write all of these addresses out to a file
+        // TODO: make this a seperate process???
+        addressArray := make([]string, len(addresses))
+        idx := 0
+        for address := range addresses {
+            addressArray[idx] = address
+            idx++
+        }
+        sort.Strings(addressArray)
+        toWrite := []byte(strings.Join(addressArray[:], "\n") + "\n")
+
+        fileName := "block/" + blockNum + ".txt"
+        err = ioutil.WriteFile(fileName, toWrite, 0777)
+        if err != nil {
+            fmt.Println("Error writing file:", err)
+        }
+        fmt.Println("Finished Block Processing:", blockNum)
+    }
+}
+
+
+// Searching!
+
 type AddrSighting struct {
     block int
     txIdx int
@@ -103,276 +377,6 @@ func searchForAddress(address string, fileNames chan string, sightings chan Addr
     }
 } 
 
-func isPotentialAddress(addr string) bool {
-    //fmt.Println("Checking for addr", addr)
-
-    small := "00000000000000000000000000000000000000ffffffffffffffffffffffffff"
-    largePrefix := "000000000000000000000000"
-
-    if addr <= small || !strings.HasPrefix(addr, largePrefix) {
-        //fmt.Println("False bc large or small", addr <= small, !strings.HasPrefix(addr, largePrefix))
-        return false
-    }
-
-    if strings.HasSuffix(addr, "00000000") {
-        //fmt.Println("False bc has suffix")
-        return false
-    }
-
-    //fmt.Println("True!")
-    return true
-}
-
-type TraceAndLogs struct {
-    Traces []byte
-    Logs  []byte
-}
-
-func getAddress(traceAndLogs chan TraceAndLogs) {
-    for blockTraceAndLog := range traceAndLogs {
-        var traces BlockTraces
-        err := json.Unmarshal(blockTraceAndLog.Traces, &traces)
-	    if err != nil {
-	    	fmt.Println("error:", err)
-        }
-        addresses := make(map[string]bool)
-        fmt.Println("Now processing block", traces.Result[0].BlockNumber)
-        //fmt.Println("Trace", string(blockTraceAndLog.Traces))
-        //fmt.Println("Log", string(blockTraceAndLog.Logs))
-
-        // Format block number, so it's 9 digits total
-        blockNum := leftZero(strconv.Itoa(traces.Result[0].BlockNumber), 9)
-        for i :=0; i < len(traces.Result); i++ {
-            idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
-            //if idx == "00011" {
-            //    fmt.Println("HERE123")
-            //}
-
-            blockAndIdx := "\t" + blockNum + "\t" + idx
-            // Try to get addresses from the input data
-            if len(traces.Result[i].Action.Input) > 10 {
-                inputData := traces.Result[i].Action.Input[10:]
-                //fmt.Println("Input data:", inputData, len(inputData))
-                for i := 0; i < len(inputData) / 64; i++ {
-                    addr := string(inputData[i * 64:(i + 1) * 64])
-                    if isPotentialAddress(addr) {
-                        addresses["0x" + string(addr[24:]) + blockAndIdx] = true
-                    }
-                }
-            }
-            if traces.Result[i].Type == "call" {
-                // If it's a call, get the to and from
-                from := traces.Result[i].Action.From
-                to := traces.Result[i].Action.To
-                addresses[from + blockAndIdx] = true
-                addresses[to + blockAndIdx] = true
-            } else if traces.Result[i].Type == "reward" {
-                if traces.Result[i].Action.RewardType == "block" {
-                    author := traces.Result[i].Action.Author
-                    addresses[author + "\t" + blockNum + "\t" + "99999"] = true
-                } else if traces.Result[i].Action.RewardType == "uncle" {
-
-                    //author := traces.Result[i].Action.Author
-                    //addresses[author + "\t" + blockNum + "\t" + "99998"] = true
-                } else {
-                    fmt.Println("New type of reward", traces.Result[i].Action.RewardType)
-                }
-            } else if traces.Result[i].Type == "suicide" {
-                // add the contract that died, and where it sent it's money
-                address := traces.Result[i].Action.Address
-                refundAddress := traces.Result[i].Action.RefundAddress
-                addresses[address + blockAndIdx] = true
-                addresses[refundAddress + blockAndIdx] = true
-            } else if traces.Result[i].Type == "create" {
-                // add the creator, and the new address name
-                from := traces.Result[i].Action.From
-                address := traces.Result[i].Result.Address
-                addresses[from + blockAndIdx] = true
-                addresses[address + blockAndIdx] = true
-
-                // If it's a top level trace, then the call data is the init, 
-                // so to match with quickblocks, we just parse init
-                if len(traces.Result[i].TraceAddress) == 0 {
-                    if len(traces.Result[i].Action.Init) > 10 {
-                        initData := traces.Result[i].Action.Init[10:]
-                        for i := 0; i < len(initData) / 64; i++ {
-                            addr := string(initData[i * 64:(i + 1) * 64])
-                            if isPotentialAddress(addr) {
-                                addresses["0x" + string(addr[24:]) + blockAndIdx] = true
-                            }
-                        }
-                    }
-                }
-
-
-            } else {
-                fmt.Println("New trace type:", string(blockTraceAndLog.Traces))
-            }
-
-            // Parse output of trace
-            if len(traces.Result[i].Result.Output) > 2 {
-                outputData := traces.Result[i].Result.Output[2:]
-                //fmt.Println("Input data:", inputData, len(inputData))
-                for i := 0; i < len(outputData) / 64; i++ {
-                    addr := string(outputData[i * 64:(i + 1) * 64])
-                    if isPotentialAddress(addr) {
-                        addresses["0x" + string(addr[24:]) + blockAndIdx] = true
-                    }
-                }
-            }
-
-        }
-
-        // Now, parse log data
-        var logs BlockLogs
-        err = json.Unmarshal(blockTraceAndLog.Logs, &logs)
-	    if err != nil {
-	    	fmt.Println("error:", err)
-        }
-
-        for i :=0; i < len(logs.Result); i++ {
-            idxInt, err := strconv.ParseInt(logs.Result[i].TransactionIndex, 0, 32)
-            if err != nil {
-                fmt.Println("Error:", err)
-            }
-            idx := leftZero(strconv.FormatInt(idxInt, 10), 5)
-            //if idx == "00011" {
-            //    fmt.Println("HERE, LOG")
-            //}
-            blockAndIdx := "\t" + blockNum + "\t" + idx
-            
-            for j := 0 ; j < len(logs.Result[i].Topics); j++ {
-                addr := string(logs.Result[i].Topics[j][2:])
-                if (isPotentialAddress(addr)) {
-                    addresses["0x" + string(addr[24:]) + blockAndIdx] = true
-                    //fmt.Println("Adding address", addr)
-                }
-            }
-
-            if len(logs.Result[i].Data) > 2 {
-                inputData := logs.Result[i].Data[2:]
-                //fmt.Println("Input data:", inputData, len(inputData))
-                for i := 0; i < len(inputData) / 64; i++ {
-                    addr := string(inputData[i * 64:(i + 1) * 64])
-                    if isPotentialAddress(addr) {
-                        addresses["0x" + string(addr[24:]) + blockAndIdx] = true
-                    }
-                }
-            }
-        }
-
-        // create an array with all the addresses, and sort
-        addressArray := make([]string, len(addresses))
-        idx := 0
-        for address := range addresses {
-            addressArray[idx] = address
-            idx++
-        }
-        sort.Strings(addressArray)
-        toWrite := []byte(strings.Join(addressArray[:], "\n") + "\n")
-
-        // TODO: make this a seperate process
-
-        // write this array to a file
-        // at least one result (as the miner got a reward)
-        fileName := "block/" + blockNum + ".txt"
-        err = ioutil.WriteFile(fileName, toWrite, 0777)
-        if err != nil {
-            fmt.Println("Error writing file:", err)
-        }
-        fmt.Println("Finished processing", traces.Result[0].BlockNumber)
-
-    }
-}
-
-type Filter struct {
-    Fromblock string        `json:"fromBlock"`
-    Toblock  string        `json:"toBlock"`
-}
-
-
-func getTrace(blocks chan int, traceAndLogs chan TraceAndLogs) {
-    // Process blocks untill the blocks channel closes
-    for block := range blocks {
-        hexBlockNum := fmt.Sprintf("0x%x", block)
-        data := Payload{
-            "2.0",
-            "trace_block",
-            Params{hexBlockNum},
-            2,
-        }
-    
-        payloadBytes, err := json.Marshal(data)
-        if err != nil {
-            fmt.Println("Error:", err)
-            return
-        }
-    
-        body := bytes.NewReader(payloadBytes)
-    
-        req, err := http.NewRequest("POST", "http://localhost:8545", body)
-        if err != nil {
-            fmt.Println("Error:", err)
-            return 
-        }
-        req.Header.Set("Content-Type", "application/json")
-    
-        resp, err := http.DefaultClient.Do(req)
-    
-        if err != nil {
-            fmt.Println("Error:", err)
-            return
-        }
-
-        traceBody, err := ioutil.ReadAll(resp.Body)
-        if err != nil {
-            fmt.Printf("Error", err)
-        }
-        resp.Body.Close()
-        
-        fmt.Println("Read in block and now sending", block)
-        
-        // Now, get the logs!
-        data = Payload{
-            "2.0",
-            "eth_getLogs",
-            Params{Filter{hexBlockNum, hexBlockNum}},
-            2,
-        }
-
-        payloadBytes, err = json.Marshal(data)
-        if err != nil {
-            fmt.Println("Error:", err)
-            return
-        }
-    
-        body = bytes.NewReader(payloadBytes)
-    
-        req, err = http.NewRequest("POST", "http://localhost:8545", body)
-        if err != nil {
-            fmt.Println("Error:", err)
-            return 
-        }
-        req.Header.Set("Content-Type", "application/json")
-    
-        resp, err = http.DefaultClient.Do(req)
-    
-        if err != nil {
-            fmt.Println("Error:", err)
-            return
-        }
-
-        logBody, err := ioutil.ReadAll(resp.Body)
-        if err != nil {
-            fmt.Printf("Error", err)
-        }
-        resp.Body.Close()
-        
-        fmt.Println("Read in block and now sending", block)
-
-        traceAndLogs <- TraceAndLogs{traceBody, logBody}
-    }
-}
 
 func testSearch() {
     fileNames := make(chan string)
@@ -402,7 +406,7 @@ func main() {
 
     // make a bunch of block trace getters
     for i := 0; i < 20; i++ {
-        go getTrace(blocks, traceAndLogs)
+        go getTraceAndLogs(blocks, traceAndLogs)
     }
 
     for i := 0; i < 100; i++ {
