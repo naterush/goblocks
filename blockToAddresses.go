@@ -169,8 +169,9 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                     author := traces.Result[i].Action.Author
                     addresses[author + "\t" + blockNum + "\t" + "99999"] = true
                 } else if traces.Result[i].Action.RewardType == "uncle" {
-                    author := traces.Result[i].Action.Author
-                    addresses[author + "\t" + blockNum + "\t" + "88888"] = true
+
+                    //author := traces.Result[i].Action.Author
+                    //addresses[author + "\t" + blockNum + "\t" + "99998"] = true
                 } else {
                     fmt.Println("New type of reward", traces.Result[i].Action.RewardType)
                 }
