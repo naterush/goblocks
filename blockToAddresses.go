@@ -6,6 +6,8 @@ import (
     "encoding/json"
     "bytes"
     "io/ioutil"
+    "sort"
+    "strings"
 )
 
 
@@ -94,13 +96,22 @@ func getAddress(traces chan []byte, done chan int) {
             }
         }
 
-        // TODO: sort addresses
-
-        // Write them to a file for a specific block
-
+        // create an array with all the addresses, and sort
+        addressArray := make([]string, len(addresses))
+        idx := 0
         for address := range addresses {
-            fmt.Println(address)
+            addressArray[idx] = address
+            idx++
         }
+        sort.Strings(addressArray)
+        toWrite := []byte(strings.Join(addressArray[:], "\n"))
+
+        // write this array to a file
+        err = ioutil.WriteFile("file.txt", toWrite, 0777)
+        if err != nil {
+            fmt.Println("Error writing file:", err)
+        }
+
         done <- 1
     }
 }
