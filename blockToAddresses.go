@@ -41,6 +41,7 @@ type BlockTraces struct {
             Address string `json:"address"` // suicide
             Balance string `json:"balance"` 
             RefundAddress string `json:"refundAddress"` 
+            Init string `json:"init"` // create
 		} `json:"action,omitempty"`
 		BlockHash   string `json:"blockHash"`
 		BlockNumber int    `json:"blockNumber"`
@@ -179,6 +180,20 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                 address := traces.Result[i].Result.Address
                 addresses[from + blockAndIdx] = true
                 addresses[address + blockAndIdx] = true
+
+                if len(traces.Result[i].Action.Init) > 2 {
+                    initData := traces.Result[i].Action.Init[2:]
+                    //fmt.Println("Input data:", inputData, len(inputData))
+                    for i := 0; i < len(initData) / 64; i++ {
+                        addr := string(initData[i * 64:(i + 1) * 64])
+                        if isPotentialAddress(addr) {
+                            addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                        }
+                    }
+                }
+
+
+
             } else {
                 fmt.Println("New trace type:", string(blockTraceAndLog.Traces))
             }
