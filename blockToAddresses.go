@@ -85,7 +85,7 @@ func isPotentialAddress(addr string) bool {
     largePrefix := "000000000000000000000000"
 
     if addr <= small || !strings.HasPrefix(addr, largePrefix) {
-        fmt.Println("False bc large or small", addr <= small, addr >= large)
+        fmt.Println("False bc large or small", addr <= small, !strings.HasPrefix(addr, largePrefix))
         return false
     }
 
