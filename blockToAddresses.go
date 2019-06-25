@@ -144,6 +144,9 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
         blockNum := leftZero(strconv.Itoa(traces.Result[0].BlockNumber), 9)
         for i :=0; i < len(traces.Result); i++ {
             idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
+            if (idx == "00004") {
+                fmt.Println("Current transaction:")
+            }
             blockAndIdx := "\t" + blockNum + "\t" + idx
             // Try to get addresses from the input data
             if len(traces.Result[i].Action.Input) > 10 {
@@ -151,6 +154,9 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                 //fmt.Println("Input data:", inputData, len(inputData))
                 for i := 0; i < len(inputData) / 64; i++ {
                     addr := string(inputData[i * 64:(i + 1) * 64])
+                    if (idx == "00004") {
+                        fmt.Println("Addr:", addr)
+                    }
                     if isPotentialAddress(addr) {
                         addresses["0x" + string(addr[24:]) + blockAndIdx] = true
                     }
