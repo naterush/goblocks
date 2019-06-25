@@ -188,6 +188,7 @@ func main() {
     for block := 5000000; block < 5000000 + 1; block++ {
         blocks <- block
     }
+    blocks <- -1
     // when the reading is done
     print(1)
     <- readDone
