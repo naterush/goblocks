@@ -313,6 +313,26 @@ func getLogAddresses(addresses map[string]bool, logs *BlockLogs, blockNum string
     }
 }
 
+func writeAddress(blockNum string, addresses map[string]bool) {
+    os.MkdirAll(folderPath, os.ModePerm)
+
+    addressArray := make([]string, len(addresses))
+    idx := 0
+    for address := range addresses {
+        addressArray[idx] = address
+        idx++
+    }
+    sort.Strings(addressArray)
+    toWrite := []byte(strings.Join(addressArray[:], "\n") + "\n")
+
+    fileName := "block/" + blockNum + ".txt"
+    err = ioutil.WriteFile(fileName, toWrite, 0777)
+    if err != nil {
+        fmt.Println("Error writing file:", err)
+    }
+    fmt.Println("Finished Block Processing:", blockNum)
+
+}
 
 func getAddress(traceAndLogs chan TraceAndLogs) {
     for blockTraceAndLog := range traceAndLogs {
@@ -338,22 +358,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
         getLogAddresses(addresses, &logs, blockNum)
 
         // Write all of these addresses out to a file
-        // TODO: make this a seperate process???
-        addressArray := make([]string, len(addresses))
-        idx := 0
-        for address := range addresses {
-            addressArray[idx] = address
-            idx++
-        }
-        sort.Strings(addressArray)
-        toWrite := []byte(strings.Join(addressArray[:], "\n") + "\n")
-
-        fileName := "block/" + blockNum + ".txt"
-        err = ioutil.WriteFile(fileName, toWrite, 0777)
-        if err != nil {
-            fmt.Println("Error writing file:", err)
-        }
-        fmt.Println("Finished Block Processing:", blockNum)
+        writeAddress(blockNum, addresses)
     }
 }
 
