@@ -112,6 +112,7 @@ func getAddress(traces chan []byte) {
             blockAndIdx := "\t" + blockNum + "\t" + idx
             // Try to get addresses from the input data
             inputData := traces.Result[i].Action.Input
+            fmt.Println("Input data:", inputData)
             if inputData != "" {
                 for i := 0; i < (len(inputData) / 64) - 1; i++ {
                     addr := string(inputData[i * 64:(i + 1) * 64])
@@ -219,7 +220,7 @@ func getTrace(blocks chan int, traces chan []byte) {
 
 func main() {
     startBlock := 4600000
-    numBlocks := 100000
+    numBlocks := 10000
 
     blocks := make(chan int)
     traces := make(chan []byte)
