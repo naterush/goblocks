@@ -6,7 +6,6 @@ import (
     "encoding/json"
     "bytes"
     "io/ioutil"
-    "time"
 )
 
 
@@ -54,8 +53,23 @@ type BlockTraces struct {
 	ID int `json:"id"`
 }
 
+func getAddress(traces chan []byte, done chan int) {
+    for blockTraces := range traces {
+        var traces BlockTraces
+        err := json.Unmarshal(blockTraces, &traces)
+	    if err != nil {
+	    	fmt.Println("error:", err)
+        }
 
-func traceProcessor(blocks chan int) {
+        for i :=0; i<len(traces.Result); i++ {
+            fmt.Println("Trace:", traces.Result[i])
+        }
+        done <- 1
+    }
+}
+
+
+func getTrace(blocks chan int, traces chan []byte) {
     // Process blocks untill the blocks channel closes
     for block := range blocks {
         hexBlockNum := fmt.Sprintf("0x%x", block)
@@ -95,110 +109,21 @@ func traceProcessor(blocks chan int) {
         resp.Body.Close()
         fmt.Println(string(body1))
 
-        var traces BlockTraces
-        err = json.Unmarshal(body1, &traces)
-	    if err != nil {
-	    	fmt.Println("error:", err)
-	    }
-	    fmt.Printf("%+v", traces)
+        traces <- body1
     }
 }
-
-
-func blockProcessor(blocks chan int) {
-    // Process blocks untill the blocks channel closes
-    for block := range blocks {
-        hexBlockNum := fmt.Sprintf("0x%x", block)
-
-        data := Payload{
-            "2.0",
-            "eth_getBlockByNumber",
-            Params{hexBlockNum, false},
-            2,
-        }
-    
-        payloadBytes, err := json.Marshal(data)
-        if err != nil {
-            fmt.Println("Error:", err)
-            return
-        }
-    
-        body := bytes.NewReader(payloadBytes)
-    
-        req, err := http.NewRequest("POST", "http://localhost:8545", body)
-        if err != nil {
-            fmt.Println("Error:", err)
-            return 
-        }
-        req.Header.Set("Content-Type", "application/json")
-    
-        resp, err := http.DefaultClient.Do(req)
-    
-        if err != nil {
-            fmt.Println("Error:", err)
-            return
-        }
-
-        _, err = ioutil.ReadAll(resp.Body)
-        if err != nil {
-            fmt.Printf("Error", err)
-        }
-        resp.Body.Close()
-    }
-}
-
-func concurrentHTTP() {
-    blocks := make(chan int)
-
-    // Make 250 block processors
-    for i := 0; i < 250; i++ {
-        go blockProcessor(blocks)
-    }
-
-    // Send the blocks to be processed
-    for i := 0; i < 100000; i++ {
-        blocks <- 5000000
-    }
-}
-
-func sequentialHTTP() {
-    blocks := make(chan int)
-
-    // Only make one block processor
-    for i := 0; i < 1; i++ {
-        go traceProcessor(blocks)
-    }
-
-    // Send the blocks to be processed
-    for i := 0; i < 2; i++ {
-        blocks <- 7223970
-    }
-}
-
 
 func main() {
-    //start := time.Now()
-    //concurrentHTTP()
-    //elapsed := time.Since(start)
-    //fmt.Println("Concurrent http took:", elapsed)
+    done := make(chan int)
+    blocks := make(chan int)
+    traces := make(chan []byte)
 
-    start := time.Now()
-    sequentialHTTP()
-    elapsed := time.Since(start)
-    fmt.Println("Sequential http took:", elapsed)
+    // Only make one block processor, send it a block
+    go getTrace(blocks, traces)
+    blocks <- 7223970
+
+    // Make a trace receiver, to process
+    go getAddress(traces, done)
+    <- done
+
 }
-
-// Make 100 trace processors
-
-// Send each processor a range of blocks to request the traces for
-// Request that range of traces
-    // Get all the accounts out of there
-    // But also get all the transaction hashes, and then request those
-
-
-
-// Make 500 "processors," each that watch a block channel
-
-// When they receive a block:
-    // Get the number of transactions in that block
-    // Get the 
