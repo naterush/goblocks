@@ -243,7 +243,7 @@ func testSearch() {
     }
 
     done := make(chan int)
-    <- done */
+    <- done
 }
 
 func main() {
