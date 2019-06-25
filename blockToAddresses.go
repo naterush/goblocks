@@ -111,13 +111,13 @@ func getAddress(traces chan []byte, done chan int) {
         if err != nil {
             fmt.Println("Error writing file:", err)
         }
-
-        done <- 1
     }
+    done <- 1
+
 }
 
 
-func getTrace(blocks chan int, traces chan []byte) {
+func getTrace(blocks chan int, traces chan []byte, readDone chan int) {
     // Process blocks untill the blocks channel closes
     for block := range blocks {
         hexBlockNum := fmt.Sprintf("0x%x", block)
@@ -159,19 +159,30 @@ func getTrace(blocks chan int, traces chan []byte) {
 
         traces <- body1
     }
+    readDone <- 1
 }
 
 func main() {
-    done := make(chan int)
+    readDone := make(chan int)
+    processDone := make(chan int)
     blocks := make(chan int)
     traces := make(chan []byte)
 
-    // Only make one block processor, send it a block
-    go getTrace(blocks, traces)
-    blocks <- 2608034
+    // make a bunch of block processors
+    for i := 0; i < 25; i++ {
+        go getTrace(blocks, traces, readDone)
+    }
 
-    // Make a trace receiver, to process
-    go getAddress(traces, done)
-    <- done
+    for i := 0; i < 100; i++ {
+        go getAddress(traces, processDone)
+    }
 
+    for block := 5000000; block < 5000000 + 1; block++ {
+        blocks <- block
+    }
+    // when the reading is done
+    <- readDone
+    close(traces)
+    // and then wait for the write to finish
+    <- processDone
 }
