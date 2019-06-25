@@ -60,7 +60,7 @@ type BlockTraces struct {
 	ID int `json:"id"`
 }
 
-func getAddress(traces chan []byte, done chan int) {
+func getAddress(traces chan []byte) {
     for blockTraces := range traces {
         var traces BlockTraces
         err := json.Unmarshal(blockTraces, &traces)
@@ -118,17 +118,12 @@ func getAddress(traces chan []byte, done chan int) {
         fmt.Println("Finished processing", traces.Result[0].BlockNumber)
 
     }
-    done <- 1
-
 }
 
 
-func getTrace(blocks chan int, traces chan []byte, readDone chan int) {
+func getTrace(blocks chan int, traces chan []byte) {
     // Process blocks untill the blocks channel closes
     for block := range blocks {
-        if block == -1 {
-            readDone <- 1
-        }
         hexBlockNum := fmt.Sprintf("0x%x", block)
         data := Payload{
             "2.0",
@@ -171,32 +166,24 @@ func getTrace(blocks chan int, traces chan []byte, readDone chan int) {
 }
 
 func main() {
-    readDone := make(chan int)
-    processDone := make(chan int)
+    done := make(chan int)
     blocks := make(chan int)
     traces := make(chan []byte)
 
     // make a bunch of block processors
     for i := 0; i < 25; i++ {
-        go getTrace(blocks, traces, readDone)
+        go getTrace(blocks, traces)
     }
 
     for i := 0; i < 100; i++ {
-        go getAddress(traces, processDone)
+        go getAddress(traces)
     }
 
     for block := 5000000; block < 5000000 + 1; block++ {
         blocks <- block
     }
-    blocks <- -1
-    // when the reading is done
-    print(1)
-    <- readDone
-    print(2)
-    close(blocks)
-    close(traces)
-    // and then wait for the write to finish
-    <- processDone
-    print(3)
+    
+    // blah, just wait around for ever (have to manuall terminate the process...)
+    <- done
 
 }
