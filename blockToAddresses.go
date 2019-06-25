@@ -173,11 +173,11 @@ func main() {
     traces := make(chan []byte)
 
     // make a bunch of block processors
-    for i := 0; i < 250; i++ {
+    for i := 0; i < 20; i++ {
         go getTrace(blocks, traces)
     }
 
-    for i := 0; i < 250; i++ {
+    for i := 0; i < 100; i++ {
         go getAddress(traces)
     }
 
