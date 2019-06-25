@@ -137,16 +137,16 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
         }
         addresses := make(map[string]bool)
         fmt.Println("Now processing block", traces.Result[0].BlockNumber)
-        fmt.Println("Trace", string(blockTraceAndLog.Traces))
-        fmt.Println("Log", string(blockTraceAndLog.Logs))
+        //fmt.Println("Trace", string(blockTraceAndLog.Traces))
+        //fmt.Println("Log", string(blockTraceAndLog.Logs))
 
         // Format block number, so it's 9 digits total
         blockNum := leftZero(strconv.Itoa(traces.Result[0].BlockNumber), 9)
         for i :=0; i < len(traces.Result); i++ {
             idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
-            if idx == "00011" {
-                fmt.Println("HERE123")
-            }
+            //if idx == "00011" {
+            //    fmt.Println("HERE123")
+            //}
 
             blockAndIdx := "\t" + blockNum + "\t" + idx
             // Try to get addresses from the input data
@@ -234,9 +234,9 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                 fmt.Println("Error:", err)
             }
             idx := leftZero(strconv.FormatInt(idxInt, 10), 5)
-            if idx == "00011" {
-                fmt.Println("HERE, LOG")
-            }
+            //if idx == "00011" {
+            //    fmt.Println("HERE, LOG")
+            //}
             blockAndIdx := "\t" + blockNum + "\t" + idx
             
             for j := 0 ; j < len(logs.Result[i].Topics); j++ {
