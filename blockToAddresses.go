@@ -140,7 +140,6 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
 
         // Format block number, so it's 9 digits total
         blockNum := leftZero(strconv.Itoa(traces.Result[0].BlockNumber), 9)
-        hit := 0
         for i :=0; i < len(traces.Result); i++ {
             idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
             blockAndIdx := "\t" + blockNum + "\t" + idx
@@ -166,14 +165,15 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                 addresses[from + blockAndIdx] = true
                 addresses[to + blockAndIdx] = true
             } else if traces.Result[i].Type == "reward" {
-                hit++
-
-                if (hit > 1) {
-                    fmt.Println(string(blockTraceAndLog.Traces))
+                if traces.Result[i].Action.RewardType == "block" {
+                    author := traces.Result[i].Action.Author
+                    addresses[author + "\t" + blockNum + "\t" + "99999"] = true
+                } else if traces.Result[i].Action.RewardType == "uncle" {
+                    author := traces.Result[i].Action.Author
+                    addresses[author + "\t" + blockNum + "\t" + "88888"] = true
+                } else {
+                    fmt.Println("New type of reward", traces.Result[i].Action.RewardType)
                 }
-                // if it's a reward, add the miner
-                author := traces.Result[i].Action.Author
-                addresses[author + "\t" + blockNum + "\t" + "99999"] = true
             } else if traces.Result[i].Type == "suicide" {
                 // add the contract that died, and where it sent it's money
                 address := traces.Result[i].Action.Address
