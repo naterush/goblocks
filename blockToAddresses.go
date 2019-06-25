@@ -149,6 +149,9 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
             // Try to get addresses from the input data
             if len(traces.Result[i].Action.Input) > 10 {
                 inputData := traces.Result[i].Action.Input[10:]
+                if (idx == "00004") {
+                    fmt.Println("Current transaction:", inputData)
+                }
                 //fmt.Println("Input data:", inputData, len(inputData))
                 for i := 0; i < len(inputData) / 64; i++ {
                     addr := string(inputData[i * 64:(i + 1) * 64])
