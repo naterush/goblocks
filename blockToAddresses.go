@@ -153,6 +153,9 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                     }
                 }
             }
+            if idx == "00020" {
+                fmt.Println("HEREHEHREHREH")
+            }
 
             if traces.Result[i].Type == "call" {
                 // If it's a call, get the to and from
@@ -362,8 +365,8 @@ func testSearch() {
 func main() {
     //testSearch()
     
-    startBlock := 7100251
-    numBlocks := 7101521 - 7100251
+    startBlock := 7100321//7100251
+    numBlocks := 1//7101521 - 7100251
 
     blocks := make(chan int)
     traceAndLogs := make(chan TraceAndLogs)
