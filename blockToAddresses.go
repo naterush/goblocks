@@ -113,12 +113,10 @@ func getAddress(traces chan []byte) {
             // Try to get addresses from the input data
             inputData := traces.Result[i].Action.Input
             fmt.Println("Input data:", inputData)
-            if inputData != "" {
-                for i := 0; i < (len(inputData) / 64) - 1; i++ {
-                    addr := string(inputData[i * 64:(i + 1) * 64])
-                    if isPotentialAddress(addr) {
-                        addresses[addr + blockAndIdx] = true
-                    }
+            for i := 0; i < (len(inputData) / 64) - 1; i++ {
+                addr := string(inputData[i * 64:(i + 1) * 64])
+                if isPotentialAddress(addr) {
+                    addresses[addr + blockAndIdx] = true
                 }
             }
 
