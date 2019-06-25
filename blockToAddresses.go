@@ -154,7 +154,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                 }
             }
             if idx == "00020" {
-                fmt.Println("HEREHEHREHREH", traces.Result[0])
+                fmt.Println("HEREHEHREHREH", blockTraceAndLog.Traces)
             }
 
             if traces.Result[i].Type == "call" {
