@@ -169,7 +169,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                 hit++
 
                 if (hit > 1) {
-                    fmt.Println(string(blockTraceAndLog.Traces))
+                    fmt.Println(string(block))
                 }
                 // if it's a reward, add the miner
                 author := traces.Result[i].Action.Author
