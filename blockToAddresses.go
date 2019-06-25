@@ -181,8 +181,8 @@ func getTrace(blocks chan int, traces chan []byte) {
 }
 
 func main() {
-    startBlock := 2000000
-    numBlocks := 1000000
+    startBlock := 4600000
+    numBlocks := 100000
 
     blocks := make(chan int)
     traces := make(chan []byte)
