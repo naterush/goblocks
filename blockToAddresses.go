@@ -203,6 +203,17 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                     //fmt.Println("Adding address", addr)
                 }
             }
+
+            if len(logs.Result[i].Data) > 2 {
+                inputData := traces.Result[i].Action.Input[2:]
+                //fmt.Println("Input data:", inputData, len(inputData))
+                for i := 0; i < len(inputData) / 64; i++ {
+                    addr := string(inputData[i * 64:(i + 1) * 64])
+                    if isPotentialAddress(addr) {
+                        addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                    }
+                }
+            }
         }
 
         // create an array with all the addresses, and sort
