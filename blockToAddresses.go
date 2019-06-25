@@ -78,6 +78,10 @@ func getAddress(traces chan []byte, done chan int) {
             }
         }
 
+        // TODO: sort addresses
+
+        // Write them to a file for a specific block
+
         for address := range addresses {
             fmt.Println(address)
         }
@@ -137,7 +141,7 @@ func main() {
 
     // Only make one block processor, send it a block
     go getTrace(blocks, traces)
-    blocks <- 7223970
+    blocks <- 2608034
 
     // Make a trace receiver, to process
     go getAddress(traces, done)
