@@ -82,7 +82,7 @@ func searchForAddress(address string, fileNames chan int, sightings chan AddrSig
         fmt.Print(string(data))
         sightings <- AddrSighting{0, 0}
     }
-} */
+} 
 
 func isPotentialAddress(addr string) bool {
     fmt.Println("Checking for addr", addr)
