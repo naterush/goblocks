@@ -186,11 +186,9 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
 
                 if len(traces.Result[i].Action.Init) > 10 {
                     initData := traces.Result[i].Action.Init[10:]
-                    fmt.Println("Input data:", initData, len(initData))
                     for i := 0; i < len(initData) / 64; i++ {
                         addr := string(initData[i * 64:(i + 1) * 64])
                         if isPotentialAddress(addr) {
-                            fmt.Println("Adding:", addr)
                             addresses["0x" + string(addr[24:]) + blockAndIdx] = true
                         }
                     }
