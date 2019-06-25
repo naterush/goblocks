@@ -62,7 +62,7 @@ func getAddress(traces chan []byte, done chan int) {
         }
 
         for i :=0; i<len(traces.Result); i++ {
-            fmt.Println("Trace:", traces.Result[i].CallType)
+            fmt.Println("Trace:", traces.Result[i].Type)
         }
         done <- 1
     }
