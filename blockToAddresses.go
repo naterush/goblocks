@@ -164,7 +164,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
         }
 
         // Now, parse log data
-        fmt.Println("Logdata:", blockTraceAndLog.Logs)
+        fmt.Println("Logdata:", string(blockTraceAndLog.Logs))
 
         // create an array with all the addresses, and sort
         addressArray := make([]string, len(addresses))
