@@ -329,13 +329,14 @@ func writeAddresses(blockNum string, addresses map[string]bool) {
         // path/to/whatever does not exist
     }
 
-    folderPath := "/blocks/" + string(blockNum[:3]) + "/" + string(blockNum[4:7]) + "/"
+    folderPath := "/blocks/" + string(blockNum[:3]) + "/" + string(blockNum[4:7])
 
     if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+        fmt.Println("HEREHERHE")
         os.MkdirAll(folderPath, os.ModePerm)
     }
 
-    fileName := folderPath + blockNum + ".txt"
+    fileName := folderPath + "/" + blockNum + ".txt"
     err := ioutil.WriteFile(fileName, toWrite, 0777)
     if err != nil {
         fmt.Println("Error writing file:", err)
