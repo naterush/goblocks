@@ -29,20 +29,24 @@ type BlockTraces struct {
 	Jsonrpc string `json:"jsonrpc"`
 	Result  []struct {
 		Action struct {
-			CallType string `json:"callType"`
+			CallType string `json:"callType"` // call
 			From     string `json:"from"`
 			Gas      string `json:"gas"`
 			Input    string `json:"input"`
 			To       string `json:"to"`
             Value    string `json:"value"`
-            Author     string `json:"author"`
-			RewardType string `json:"rewardType"`
+            Author     string `json:"author"` // reward
+            RewardType string `json:"rewardType"` 
+            Address string `json:"address"` // suicide
+            Balance string `json:"balance"` 
+            RefundAddress string `json:"refundAddress"` 
 		} `json:"action,omitempty"`
 		BlockHash   string `json:"blockHash"`
 		BlockNumber int    `json:"blockNumber"`
 		Result      struct {
-			GasUsed string `json:"gasUsed"`
-			Output  string `json:"output"`
+			GasUsed string `json:"gasUsed"` // call
+            Output  string `json:"output"`
+            Address string `json:"address"` // create
 		} `json:"result"`
 		Subtraces           int           `json:"subtraces"`
 		TraceAddress        []interface{} `json:"traceAddress"`
@@ -73,6 +77,18 @@ func getAddress(traces chan []byte, done chan int) {
                 // if it's a reward, add the miner
                 author := traces.Result[i].Action.Author
                 addresses[author] = true
+            } else if traces.Result[i].Type == "suicide" {
+                // add the contract that died, and where it sent it's money
+                address := traces.Result[i].Action.Address
+                refundAddress := traces.Result[i].Action.RefundAddress
+                addresses[address] = true
+                addresses[refundAddress] = true
+            } else if traces.Result[i].Type == "create" {
+                // add the creator, and the new address name
+                from := traces.Result[i].Action.From
+                address := traces.Result[i].Result.Address
+                addresses[from] = true
+                addresses[address] = true
             } else {
                 fmt.Println("New trace type:", string(blockTraces))
             }
