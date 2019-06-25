@@ -68,6 +68,7 @@ func getAddress(traces chan []byte, done chan int) {
 	    	fmt.Println("error:", err)
         }
         addresses := make(map[string]bool)
+        fmt.Println("Now processing block", traces.Result[0].BlockNumber)
 
         for i :=0; i<len(traces.Result); i++ {
             if traces.Result[i].Type == "call" {
@@ -114,6 +115,8 @@ func getAddress(traces chan []byte, done chan int) {
         if err != nil {
             fmt.Println("Error writing file:", err)
         }
+        fmt.Println("Finished processing", traces.Result[0].BlockNumber)
+
     }
     done <- 1
 
@@ -159,7 +162,8 @@ func getTrace(blocks chan int, traces chan []byte, readDone chan int) {
         }
         resp.Body.Close()
         fmt.Println(string(body1))
-
+        
+        fmt.Println("Read in block and now sending", block)
         traces <- body1
     }
     readDone <- 1
