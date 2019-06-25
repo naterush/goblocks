@@ -108,6 +108,8 @@ func getAddress(traces chan []byte) {
         sort.Strings(addressArray)
         toWrite := []byte(strings.Join(addressArray[:], "\n"))
 
+        // TODO: make this a seperate process
+
         // write this array to a file
         // at least one result (as the miner got a reward)
         fileName := "block/file" + strconv.Itoa(traces.Result[0].BlockNumber) + ".txt"
@@ -166,7 +168,7 @@ func getTrace(blocks chan int, traces chan []byte) {
 }
 
 func main() {
-    numBlocks := 5000
+    numBlocks := 10000
 
     done := make(chan int)
     blocks := make(chan int)
