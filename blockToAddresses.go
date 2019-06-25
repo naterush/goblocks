@@ -398,8 +398,8 @@ func testSearch() {
 func main() {
     //testSearch()
     
-    startBlock := 7100251
-    numBlocks := 7101521 - 7100251
+    startBlock := 1000000
+    numBlocks := 250000
 
     blocks := make(chan int)
     traceAndLogs := make(chan TraceAndLogs)
