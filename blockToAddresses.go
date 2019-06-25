@@ -21,7 +21,7 @@ type JSONPayload struct {
 }
 
 // Returns all traces for a given block
-func getTracesForBlock(blockNum int) ([]byte, error) {
+func getTracesForBlock(blockNum int) (*[]byte, error) {
     hexBlockNum := fmt.Sprintf("0x%x", blockNum)
 
     data := JSONPayload {
@@ -55,7 +55,7 @@ func getTracesForBlock(blockNum int) ([]byte, error) {
     }
     defer resp.Body.Close()
 
-    return tracesBody, nil
+    return &tracesBody, nil
 }
 
 type Filter struct {
@@ -64,7 +64,7 @@ type Filter struct {
 }
 
 // Returns all logs for a given block
-func getLogsForBlock(blockNum int) ([]byte, error) {
+func getLogsForBlock(blockNum int) (*[]byte, error) {
     hexBlockNum := fmt.Sprintf("0x%x", blockNum)
 
     data := JSONPayload {
@@ -99,7 +99,7 @@ func getLogsForBlock(blockNum int) ([]byte, error) {
     }
     defer resp.Body.Close()
 
-    return logsBody, nil
+    return &logsBody, nil
 }
 
 type TraceAndLogs struct {
