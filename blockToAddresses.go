@@ -143,7 +143,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
         for i :=0; i < len(traces.Result); i++ {
             idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
             if (idx == "00004") {
-                fmt.Println("Current transaction:")
+                fmt.Println("Current transaction:", Input)
             }
             blockAndIdx := "\t" + blockNum + "\t" + idx
             // Try to get addresses from the input data
