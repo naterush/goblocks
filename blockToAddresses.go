@@ -358,7 +358,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
         getLogAddresses(addresses, &logs, blockNum)
 
         // Write all of these addresses out to a file
-        writeAddress(blockNum, addresses)
+        go writeAddress(blockNum, addresses)
     }
 }
 
@@ -403,7 +403,7 @@ func testSearch() {
 func main() {
     //testSearch()
     
-    startBlock := 5010000
+    startBlock := 5020000
     numBlocks := 10000
 
     blocks := make(chan int)
