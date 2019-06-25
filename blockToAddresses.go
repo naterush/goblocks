@@ -79,20 +79,22 @@ func searchForAddress(address string, blocks chan int, ) {
 } */
 
 func isPotentialAddress(addr string) bool {
+    fmt.Println("Checking for addr", addr)
+
     small := "00000000000000ffffffffffffffffffffffffff"
     largePrefix := "000000000000000000000000"
 
     if addr <= small || !strings.HasPrefix(addr, largePrefix) {
-        //fmt.Println("False bc large or small", addr <= small, addr >= large)
+        fmt.Println("False bc large or small", addr <= small, addr >= large)
         return false
     }
 
     if strings.HasSuffix(addr, "00000000") {
-        //fmt.Println("False bc has suffix")
+        fmt.Println("False bc has suffix")
         return false
     }
 
-    //fmt.Println("True!")
+    fmt.Println("True!")
     return true
 }
 
@@ -223,7 +225,7 @@ func getTrace(blocks chan int, traces chan []byte) {
 
 func main() {
     startBlock := 2608034
-    numBlocks := 10000
+    numBlocks := 1
 
     blocks := make(chan int)
     traces := make(chan []byte)
