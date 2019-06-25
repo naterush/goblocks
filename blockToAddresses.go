@@ -149,15 +149,9 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
             // Try to get addresses from the input data
             if len(traces.Result[i].Action.Input) > 10 {
                 inputData := traces.Result[i].Action.Input[10:]
-                if (idx == "00004") {
-                    fmt.Println("Current transaction:", inputData)
-                }
                 //fmt.Println("Input data:", inputData, len(inputData))
                 for i := 0; i < len(inputData) / 64; i++ {
                     addr := string(inputData[i * 64:(i + 1) * 64])
-                    if (idx == "00004") {
-                        fmt.Println("Addr:", addr)
-                    }
                     if isPotentialAddress(addr) {
                         addresses["0x" + string(addr[24:]) + blockAndIdx] = true
                     }
@@ -197,9 +191,9 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                 addresses[from + blockAndIdx] = true
                 addresses[address + blockAndIdx] = true
 
-                if len(traces.Result[i].Action.Init) > 2 {
-                    initData := traces.Result[i].Action.Init[2:]
-                    //fmt.Println("Input data:", inputData, len(inputData))
+                if len(traces.Result[i].Action.Init) > 10 {
+                    initData := traces.Result[i].Action.Init[10:]
+                    fmt.Println("Input data:", inputData, len(initData))
                     for i := 0; i < len(initData) / 64; i++ {
                         addr := string(initData[i * 64:(i + 1) * 64])
                         if isPotentialAddress(addr) {
@@ -397,7 +391,7 @@ func main() {
     //testSearch()
     
     startBlock := 7100362 //7100251
-    numBlocks := 1//7101521 - 7100251
+    numBlocks := 1 //7101521 - 7100251
 
     blocks := make(chan int)
     traceAndLogs := make(chan TraceAndLogs)
