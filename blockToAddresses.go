@@ -60,9 +60,26 @@ func getAddress(traces chan []byte, done chan int) {
 	    if err != nil {
 	    	fmt.Println("error:", err)
         }
+        addresses := make(map[string]bool)
 
         for i :=0; i<len(traces.Result); i++ {
-            fmt.Println("Trace:", traces.Result[i].Type)
+            if traces.Result[i].Type == "call" {
+                // If it's a call, get the to and from
+                from := traces.Result[i].Action.From
+                to := traces.Result[i].Action.To
+                addresses[from] = true
+                addresses[to] = true
+            } else if traces.Result[i].Type == "reward" {
+                // if it's a reward, add the miner
+                author := traces.Result[i].Action.Author
+                addresses[author] = true
+            } else {
+                fmt.Println("New trace type:", traces.Result[i].Type)
+            }
+        }
+
+        for address := range addresses {
+            fmt.Println(address)
         }
         done <- 1
     }
