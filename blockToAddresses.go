@@ -8,6 +8,7 @@ import (
     "io/ioutil"
     "sort"
     "strings"
+    "strconv"
 )
 
 
@@ -107,7 +108,9 @@ func getAddress(traces chan []byte, done chan int) {
         toWrite := []byte(strings.Join(addressArray[:], "\n"))
 
         // write this array to a file
-        err = ioutil.WriteFile("file.txt", toWrite, 0777)
+        // at least one result (as the miner got a reward)
+        fileName := "file" + strconv.Itoa(traces.Result[0].BlockNumber) + ".txt"
+        err = ioutil.WriteFile(fileName, toWrite, 0777)
         if err != nil {
             fmt.Println("Error writing file:", err)
         }
