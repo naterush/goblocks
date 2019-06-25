@@ -85,22 +85,22 @@ func searchForAddress(address string, fileNames chan string, sightings chan Addr
 } 
 
 func isPotentialAddress(addr string) bool {
-    fmt.Println("Checking for addr", addr)
+    //fmt.Println("Checking for addr", addr)
 
     small := "00000000000000000000000000000000000000ffffffffffffffffffffffffff"
     largePrefix := "000000000000000000000000"
 
     if addr <= small || !strings.HasPrefix(addr, largePrefix) {
-        fmt.Println("False bc large or small", addr <= small, !strings.HasPrefix(addr, largePrefix))
+        //fmt.Println("False bc large or small", addr <= small, !strings.HasPrefix(addr, largePrefix))
         return false
     }
 
     if strings.HasSuffix(addr, "00000000") {
-        fmt.Println("False bc has suffix")
+        //fmt.Println("False bc has suffix")
         return false
     }
 
-    fmt.Println("True!")
+    //fmt.Println("True!")
     return true
 }
 
