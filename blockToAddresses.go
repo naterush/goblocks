@@ -403,8 +403,8 @@ func testSearch() {
 func main() {
     //testSearch()
     
-    startBlock := 5000000
-    numBlocks := 250000
+    startBlock := 5010000
+    numBlocks := 10000
 
     blocks := make(chan int)
     traceAndLogs := make(chan TraceAndLogs)
