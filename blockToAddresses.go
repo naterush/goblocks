@@ -81,8 +81,8 @@ func searchForAddress(address string, blocks chan int, ) {
 func isPotentialAddress(addr string) bool {
     fmt.Println("Is potential address:", addr)
 
-    small := "00000000000000ffffffffffffffffffffffffff"
-    large := "010000000000000000000000000000000000000000"
+    small := "00000000000000000000000000000000000000ffffffffffffffffffffffffff"
+    large := "0000000000000000000000010000000000000000000000000000000000000000"
 
     if addr <= small || addr >= large {
         fmt.Println("False bc large or small", addr <= small, addr >= large)
