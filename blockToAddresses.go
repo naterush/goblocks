@@ -247,10 +247,10 @@ func testSearch() {
 }
 
 func main() {
-    testSearch()
-    /*
-    startBlock := 6000000
-    numBlocks := 10000
+    //testSearch()
+    
+    startBlock := 7100251
+    numBlocks := 7101521 - 7100251
 
     blocks := make(chan int)
     traces := make(chan []byte)
@@ -270,5 +270,5 @@ func main() {
     
     // blah, just wait around for ever (have to manuall terminate the process...)
     done := make(chan int)
-    <- done */
+    <- done 
 }
