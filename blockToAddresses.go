@@ -205,7 +205,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
             }
 
             if len(logs.Result[i].Data) > 2 {
-                inputData := traces.Result[i].Action.Input[2:]
+                inputData := logs.Result[i].Data[2:]
                 //fmt.Println("Input data:", inputData, len(inputData))
                 for i := 0; i < len(inputData) / 64; i++ {
                     addr := string(inputData[i * 64:(i + 1) * 64])
