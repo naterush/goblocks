@@ -142,6 +142,10 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
         blockNum := leftZero(strconv.Itoa(traces.Result[0].BlockNumber), 9)
         for i :=0; i < len(traces.Result); i++ {
             idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
+            if idx == "00011" {
+                fmt.Println("HERE123")
+            }
+
             blockAndIdx := "\t" + blockNum + "\t" + idx
             // Try to get addresses from the input data
             if len(traces.Result[i].Action.Input) > 10 {
@@ -227,6 +231,9 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                 fmt.Println("Error:", err)
             }
             idx := leftZero(strconv.FormatInt(idxInt, 10), 5)
+            if idx == "00011" {
+                fmt.Println("HERE, LOG")
+            }
             blockAndIdx := "\t" + blockNum + "\t" + idx
             
             for j := 0 ; j < len(logs.Result[i].Topics); j++ {
@@ -382,8 +389,8 @@ func testSearch() {
 func main() {
     //testSearch()
     
-    startBlock := 7100251
-    numBlocks := 7101521 - 7100251
+    startBlock := 7100299//7100251
+    numBlocks := 1//7101521 - 7100251
 
     blocks := make(chan int)
     traceAndLogs := make(chan TraceAndLogs)
