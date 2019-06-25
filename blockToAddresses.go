@@ -137,6 +137,8 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
         }
         addresses := make(map[string]bool)
         fmt.Println("Now processing block", traces.Result[0].BlockNumber)
+        fmt.Println("Trace", string(blockTraceAndLog.Traces))
+        fmt.Println("Log", string(blockTraceAndLog.Logs))
 
         // Format block number, so it's 9 digits total
         blockNum := leftZero(strconv.Itoa(traces.Result[0].BlockNumber), 9)
