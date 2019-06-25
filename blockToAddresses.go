@@ -190,6 +190,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                 addresses[from + blockAndIdx] = true
                 addresses[address + blockAndIdx] = true
 
+                /*
                 if len(traces.Result[i].Action.Init) > 10 {
                     initData := traces.Result[i].Action.Init[10:]
                     for i := 0; i < len(initData) / 64; i++ {
@@ -198,7 +199,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
                             addresses["0x" + string(addr[24:]) + blockAndIdx] = true
                         }
                     }
-                }
+                } */
 
 
 
