@@ -190,9 +190,13 @@ func main() {
         blocks <- block
     }
     // when the reading is done
+    print(1)
     <- readDone
+    print(2)
     close(blocks)
     close(traces)
     // and then wait for the write to finish
     <- processDone
+    print(3)
+
 }
