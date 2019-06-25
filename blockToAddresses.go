@@ -313,8 +313,7 @@ func getLogAddresses(addresses map[string]bool, logs *BlockLogs, blockNum string
     }
 }
 
-func writeAddress(blockNum string, addresses map[string]bool) {
-    //os.MkdirAll(folderPath, os.ModePerm)
+func writeAddresses(blockNum string, addresses map[string]bool) {
 
     addressArray := make([]string, len(addresses))
     idx := 0
@@ -325,7 +324,17 @@ func writeAddress(blockNum string, addresses map[string]bool) {
     sort.Strings(addressArray)
     toWrite := []byte(strings.Join(addressArray[:], "\n") + "\n")
 
-    fileName := "block/" + blockNum + ".txt"
+    if _, err := os.Stat("/path/to/whatever"); os.IsNotExist(err) {
+        // path/to/whatever does not exist
+    }
+
+    folderPath := "/blocks/" + string(blockNum[:3]) + "/" + string(blockNum[4:6])
+
+    if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+        os.MkdirAll(folderPath, os.ModePerm)
+    }
+
+    fileName := folderPath + blockNum + ".txt"
     err := ioutil.WriteFile(fileName, toWrite, 0777)
     if err != nil {
         fmt.Println("Error writing file:", err)
@@ -358,7 +367,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
         getLogAddresses(addresses, &logs, blockNum)
 
         // Write all of these addresses out to a file
-        go writeAddress(blockNum, addresses)
+        go writeAddresses(blockNum, addresses)
     }
 }
 
