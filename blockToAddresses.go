@@ -104,10 +104,15 @@ func isPotentialAddress(addr string) bool {
     return true
 }
 
-func getAddress(traces chan []byte) {
-    for blockTraces := range traces {
+type TraceAndLogs struct {
+    Traces []byte
+    Logs  []byte
+}
+
+func getAddress(traceAndLogs chan TraceAndLogs) {
+    for blockTraceAndLog := range traceAndLogs {
         var traces BlockTraces
-        err := json.Unmarshal(blockTraces, &traces)
+        err := json.Unmarshal(blockTraceAndLog.Traces, &traces)
 	    if err != nil {
 	    	fmt.Println("error:", err)
         }
@@ -130,8 +135,6 @@ func getAddress(traces chan []byte) {
                     }
                 }
             }
-
-            
 
             if traces.Result[i].Type == "call" {
                 // If it's a call, get the to and from
@@ -156,9 +159,12 @@ func getAddress(traces chan []byte) {
                 addresses[from + blockAndIdx] = true
                 addresses[address + blockAndIdx] = true
             } else {
-                fmt.Println("New trace type:", string(blockTraces))
+                fmt.Println("New trace type:", string(blockTraceAndLog.Traces))
             }
         }
+
+        // Now, parse log data
+        fmt.Println("Logdata:", blockTraceAndLog.Logs)
 
         // create an array with all the addresses, and sort
         addressArray := make([]string, len(addresses))
@@ -184,8 +190,13 @@ func getAddress(traces chan []byte) {
     }
 }
 
+type Filter struct {
+    Fromblock string        `json:"fromBlock"`
+    Toblock  string        `json:"toBlock"`
+}
 
-func getTrace(blocks chan int, traces chan []byte) {
+
+func getTrace(blocks chan int, traceAndLogs chan TraceAndLogs) {
     // Process blocks untill the blocks channel closes
     for block := range blocks {
         hexBlockNum := fmt.Sprintf("0x%x", block)
@@ -218,14 +229,53 @@ func getTrace(blocks chan int, traces chan []byte) {
             return
         }
 
-        body1, err := ioutil.ReadAll(resp.Body)
+        traceBody, err := ioutil.ReadAll(resp.Body)
         if err != nil {
             fmt.Printf("Error", err)
         }
         resp.Body.Close()
         
         fmt.Println("Read in block and now sending", block)
-        traces <- body1
+        
+        // Now, get the logs!
+        data = Payload{
+            "2.0",
+            "eth_getLogs",
+            Params{Filter{hexBlockNum, hexBlockNum}},
+            2,
+        }
+
+        payloadBytes, err = json.Marshal(data)
+        if err != nil {
+            fmt.Println("Error:", err)
+            return
+        }
+    
+        body = bytes.NewReader(payloadBytes)
+    
+        req, err = http.NewRequest("POST", "http://localhost:8545", body)
+        if err != nil {
+            fmt.Println("Error:", err)
+            return 
+        }
+        req.Header.Set("Content-Type", "application/json")
+    
+        resp, err = http.DefaultClient.Do(req)
+    
+        if err != nil {
+            fmt.Println("Error:", err)
+            return
+        }
+
+        logBody, err := ioutil.ReadAll(resp.Body)
+        if err != nil {
+            fmt.Printf("Error", err)
+        }
+        resp.Body.Close()
+        
+        fmt.Println("Read in block and now sending", block)
+
+        traceAndLogs <- TraceAndLogs{traceBody, logBody}
     }
 }
 
@@ -250,18 +300,18 @@ func main() {
     //testSearch()
     
     startBlock := 7100251
-    numBlocks := 7101521 - 7100251
+    numBlocks := 1 //7101521 - 7100251
 
     blocks := make(chan int)
-    traces := make(chan []byte)
+    traceAndLogs := make(chan TraceAndLogs)
 
     // make a bunch of block trace getters
     for i := 0; i < 20; i++ {
-        go getTrace(blocks, traces)
+        go getTrace(blocks, traceAndLogs)
     }
 
     for i := 0; i < 100; i++ {
-        go getAddress(traces)
+        go getAddress(traceAndLogs)
     }
 
     for block := startBlock; block < startBlock + numBlocks; block++ {
