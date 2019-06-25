@@ -112,14 +112,18 @@ func getAddress(traces chan []byte) {
             idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
             blockAndIdx := "\t" + blockNum + "\t" + idx
             // Try to get addresses from the input data
-            inputData := traces.Result[i].Action.Input[10:]
-            //fmt.Println("Input data:", inputData, len(inputData))
-            for i := 0; i < len(inputData) / 64; i++ {
-                addr := string(inputData[i * 64:(i + 1) * 64])
-                if isPotentialAddress(addr) {
-                    addresses[addr + blockAndIdx] = true
+            if len(traces.Result[i].Action.Input) > 10 {
+                inputData := traces.Result[i].Action.Input[10:]
+                //fmt.Println("Input data:", inputData, len(inputData))
+                for i := 0; i < len(inputData) / 64; i++ {
+                    addr := string(inputData[i * 64:(i + 1) * 64])
+                    if isPotentialAddress(addr) {
+                        addresses[addr + blockAndIdx] = true
+                    }
                 }
             }
+
+            
 
             if traces.Result[i].Type == "call" {
                 // If it's a call, get the to and from
