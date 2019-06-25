@@ -398,7 +398,7 @@ func testSearch() {
 func main() {
     //testSearch()
     
-    startBlock := 1000000
+    startBlock := 5000000
     numBlocks := 250000
 
     blocks := make(chan int)
