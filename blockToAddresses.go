@@ -126,6 +126,9 @@ func getAddress(traces chan []byte, done chan int) {
 func getTrace(blocks chan int, traces chan []byte, readDone chan int) {
     // Process blocks untill the blocks channel closes
     for block := range blocks {
+        if block == -1 {
+            readDone <- 1
+        }
         hexBlockNum := fmt.Sprintf("0x%x", block)
         data := Payload{
             "2.0",
@@ -166,7 +169,6 @@ func getTrace(blocks chan int, traces chan []byte, readDone chan int) {
         fmt.Println("Read in block and now sending", block)
         traces <- body1
     }
-    readDone <- 1
 }
 
 func main() {
@@ -187,9 +189,9 @@ func main() {
     for block := 5000000; block < 5000000 + 1; block++ {
         blocks <- block
     }
-    close(blocks)
     // when the reading is done
     <- readDone
+    close(blocks)
     close(traces)
     // and then wait for the write to finish
     <- processDone
