@@ -225,7 +225,7 @@ func getTrace(blocks chan int, traces chan []byte) {
 
 func main() {
     startBlock := 8028001
-    numBlocks := startBlock - 8028299
+    numBlocks := 8028299 - startBlock
 
     blocks := make(chan int)
     traces := make(chan []byte)
