@@ -354,14 +354,16 @@ func getTraceAddresses(addresses map[string]bool, traces *BlockTraces, blockNum 
             // If this has failed, then I can get the 
 
             // Handle contract creations that error out
-            fmt.Println("i: |", i, "|")
-            fmt.Println("traces.Result[i].Error: |", traces.Result[i].Error, "|")
-            fmt.Println("traces.Result[i].Action.To: |", traces.Result[i].Action.To, "|")
-            fmt.Println("traces.Result[i].Result.Address: |", traces.Result[i].Result.Address, "|")
+//            fmt.Println("i: |", i, "|")
+//            fmt.Println("traces.Result[i].Error: |", traces.Result[i].Error, "|")
+//            fmt.Println("traces.Result[i].Action.To: |", traces.Result[i].Action.To, "|")
+//            fmt.Println("traces.Result[i].Result.Address: |", traces.Result[i].Result.Address, "|")
             if traces.Result[i].Action.To == "" {
                 if traces.Result[i].Result.Address == "" {
                     if traces.Result[i].Error != "" {
+// getTransactionReceipt(traces.Result[i].TransactionHash)
 fmt.Println("This is one of the error creations", blockAndIdx)
+fmt.Println("Don't know how to use the result of getTransactionRecipt")
                     }
                 }
             }
