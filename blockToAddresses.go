@@ -23,40 +23,23 @@ type JSONPayload struct {
 
 // Returns all traces for a given block
 func getTracesForBlock(blockNum int) ([]byte, error) {
-    hexBlockNum := fmt.Sprintf("0x%x", blockNum)
-
-    data := JSONPayload {
-        "2.0",
-        "trace_block",
-        Params{hexBlockNum},
-        2,
+    payloadBytes, err := json.Marshal(JSONPayload{"2.0", "trace_block", Params{fmt.Sprintf("0x%x", blockNum)}, 2})
+    if err == nil {
+        body := bytes.NewReader(payloadBytes)
+        req, err := http.NewRequest("POST", "http://localhost:8545", body)
+        if err == nil {
+            req.Header.Set("Content-Type", "application/json")
+            resp, err := http.DefaultClient.Do(req)
+            if err == nil {
+                tracesBody, err := ioutil.ReadAll(resp.Body)
+                if err == nil {
+                    defer resp.Body.Close()
+                    return tracesBody, nil
+                }
+            }
+        }
     }
-
-    payloadBytes, err := json.Marshal(data)
-    if err != nil {
-        return nil, err
-    }
-
-    body := bytes.NewReader(payloadBytes)
-
-    req, err := http.NewRequest("POST", "http://localhost:8545", body)
-    if err != nil {
-        return nil, err
-    }
-    req.Header.Set("Content-Type", "application/json")
-
-    resp, err := http.DefaultClient.Do(req)
-    if err != nil {
-        return nil, err
-    }
-
-    tracesBody, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        return nil, err
-    }
-    defer resp.Body.Close()
-
-    return tracesBody, nil
+    return nil, err
 }
 
 type Filter struct {
@@ -66,76 +49,44 @@ type Filter struct {
 
 // Returns all logs for a given block
 func getLogsForBlock(blockNum int) ([]byte, error) {
-    hexBlockNum := fmt.Sprintf("0x%x", blockNum)
-
-    data := JSONPayload {
-        "2.0",
-        "eth_getLogs",
-        Params{Filter{hexBlockNum, hexBlockNum}},
-        2,
+    payloadBytes, err := json.Marshal(JSONPayload{"2.0", "eth_getLogs", Params{Filter{fmt.Sprintf("0x%x", blockNum), fmt.Sprintf("0x%x", blockNum)}}, 2})
+    if err == nil {
+        body := bytes.NewReader(payloadBytes)
+        req, err := http.NewRequest("POST", "http://localhost:8545", body)
+        if err == nil {
+            req.Header.Set("Content-Type", "application/json")
+            resp, err := http.DefaultClient.Do(req)
+            if err == nil {
+                logsBody, err := ioutil.ReadAll(resp.Body)
+                if err == nil {
+                    defer resp.Body.Close()
+                    return logsBody, nil
+                }
+            }
+        }
     }
-
-    payloadBytes, err := json.Marshal(data)
-    if err != nil {
-        return nil, err
-    }
-
-    body := bytes.NewReader(payloadBytes)
-
-    req, err := http.NewRequest("POST", "http://localhost:8545", body)
-    if err != nil {
-        return nil, err
-    }
-    req.Header.Set("Content-Type", "application/json")
-
-    resp, err := http.DefaultClient.Do(req)
-    if err != nil {
-        return nil, err
-    }
-
-    logsBody, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        return nil, err
-    }
-    defer resp.Body.Close()
-
-    return logsBody, nil
+    return nil, err
 }
 
 // Returns recipt for a given transaction -- only used in errored contract creations
 func getTransactionReceipt(hash string) ([]byte, error) {
-    data := JSONPayload {
-        "2.0",
-        "eth_getTransactionReceipt",
-        Params{hash},
-        2,
+    payloadBytes, err := json.Marshal(JSONPayload{"2.0", "eth_getTransactionReceipt", Params{hash}, 2})
+    if err == nil {
+        body := bytes.NewReader(payloadBytes)
+        req, err := http.NewRequest("POST", "http://localhost:8545", body)
+        if err == nil {
+            req.Header.Set("Content-Type", "application/json")
+            resp, err := http.DefaultClient.Do(req)
+            if err == nil {
+                receiptBody, err := ioutil.ReadAll(resp.Body)
+                if err == nil {
+                    defer resp.Body.Close()
+                    return receiptBody, nil
+                }
+            }
+        }
     }
-
-    payloadBytes, err := json.Marshal(data)
-    if err != nil {
-        return nil, err
-    }
-
-    body := bytes.NewReader(payloadBytes)
-
-    req, err := http.NewRequest("POST", "http://localhost:8545", body)
-    if err != nil {
-        return nil, err
-    }
-    req.Header.Set("Content-Type", "application/json")
-
-    resp, err := http.DefaultClient.Do(req)
-    if err != nil {
-        return nil, err
-    }
-
-    receiptBody, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        return nil, err
-    }
-    defer resp.Body.Close()
-
-    return receiptBody, nil
+    return nil, err
 }
 
 type TraceAndLogs struct {
@@ -150,7 +101,7 @@ func getTraceAndLogs(blocks chan int, traceAndLogs chan TraceAndLogs) {
         if err != nil {
             panic(err)
         }
-        logs, err := getLogsForBlock(blockNum) 
+        logs, err := getLogsForBlock(blockNum)
         if err != nil {
             panic(err)
         }
@@ -159,55 +110,55 @@ func getTraceAndLogs(blocks chan int, traceAndLogs chan TraceAndLogs) {
 }
 
 type BlockTraces struct {
-	Jsonrpc string `json:"jsonrpc"`
-	Result  []struct {
-		Action struct {
-			CallType string `json:"callType"` // call
-			From     string `json:"from"`
-			Gas      string `json:"gas"`
-			Input    string `json:"input"`
-			To       string `json:"to"`
-            Value    string `json:"value"`
-            Author     string `json:"author"` // reward
-            RewardType string `json:"rewardType"` 
-            Address string `json:"address"` // suicide
-            Balance string `json:"balance"` 
-            RefundAddress string `json:"refundAddress"` 
-            Init string `json:"init"` // create
-		} `json:"action,omitempty"`
-		BlockHash   string `json:"blockHash"`
-		BlockNumber int    `json:"blockNumber"`
+    Jsonrpc string `json:"jsonrpc"`
+    Result  []struct {
+        Action struct {
+            CallType      string `json:"callType"` // call
+            From          string `json:"from"`
+                Gas           string `json:"gas"`
+            Input         string `json:"input"`
+            To            string `json:"to"`
+            Value         string `json:"value"`
+            Author        string `json:"author"` // reward
+            RewardType    string `json:"rewardType"`
+            Address       string `json:"address"` // suicide
+            Balance       string `json:"balance"`
+            RefundAddress string `json:"refundAddress"`
+            Init          string `json:"init"` // create
+        } `json:"action,omitempty"`
+        BlockHash   string `json:"blockHash"`
+        BlockNumber int    `json:"blockNumber"`
         Error       string `json:"error"`
-		Result      struct {
-			GasUsed string `json:"gasUsed"` // call
+        Result      struct {
+            GasUsed string `json:"gasUsed"` // call
             Output  string `json:"output"`
             Address string `json:"address"` // create
-		} `json:"result"`
-		Subtraces           int           `json:"subtraces"`
-		TraceAddress        []interface{} `json:"traceAddress"`
-		TransactionHash     string        `json:"transactionHash"`
-		TransactionPosition int           `json:"transactionPosition"`
+        } `json:"result"`
+        Subtraces           int           `json:"subtraces"`
+        TraceAddress        []interface{} `json:"traceAddress"`
+        TransactionHash     string        `json:"transactionHash"`
+        TransactionPosition int           `json:"transactionPosition"`
         Type                string        `json:"type"`
-	} `json:"result"`
-	ID int `json:"id"`
+    } `json:"result"`
+    ID int `json:"id"`
 }
 
 type BlockLogs struct {
-	Jsonrpc string `json:"jsonrpc"`
-	Result  []struct {
-		Address             string   `json:"address"`
-		BlockHash           string   `json:"blockHash"`
-		BlockNumber         string   `json:"blockNumber"`
-		Data                string   `json:"data"`
-		LogIndex            string   `json:"logIndex"`
-		Removed             bool     `json:"removed"`
-		Topics              []string `json:"topics"`
-		TransactionHash     string   `json:"transactionHash"`
-		TransactionIndex    string   `json:"transactionIndex"`
-		TransactionLogIndex string   `json:"transactionLogIndex"`
-		Type                string   `json:"type"`
-	} `json:"result"`
-	ID int `json:"id"`
+    Jsonrpc string `json:"jsonrpc"`
+    Result  []struct {
+        Address             string   `json:"address"`
+        BlockHash           string   `json:"blockHash"`
+        BlockNumber         string   `json:"blockNumber"`
+        Data                string   `json:"data"`
+        LogIndex            string   `json:"logIndex"`
+        Removed             bool     `json:"removed"`
+        Topics              []string `json:"topics"`
+        TransactionHash     string   `json:"transactionHash"`
+        TransactionIndex    string   `json:"transactionIndex"`
+        TransactionLogIndex string   `json:"transactionLogIndex"`
+        Type                string   `json:"type"`
+    } `json:"result"`
+    ID int `json:"id"`
 }
 
 type TransReceipt struct {
@@ -227,13 +178,13 @@ type TransReceipt struct {
         TransactionHash   string        `json:"transactionHash"`
         TransactionIndex  string        `json:"transactionIndex"`
     } `json:"result"`
-    ID string `json:"id"`
+    ID int `json:"id"`
 }
 
 func leftZero(str string, totalLen int) string {
     // Assume len(str) < totalLen
     zeros := ""
-    for i :=0 ; i < totalLen - len(str); i++ {
+    for i := 0; i < totalLen - len(str); i++ {
         zeros += "0"
     }
     return zeros + str
@@ -264,7 +215,7 @@ func isPotentialAddress(addr string) bool {
 
 func getTraceAddresses(addresses map[string]bool, traces *BlockTraces, blockNum string) {
 
-    for i :=0; i < len(traces.Result); i++ {
+    for i := 0; i < len(traces.Result); i++ {
 
         idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
 
@@ -332,7 +283,7 @@ func getTraceAddresses(addresses map[string]bool, traces *BlockTraces, blockNum 
                 addresses[address + blockAndIdx] = true
             }
 
-            // If it's a top level trace, then the call data is the init, 
+            // If it's a top level trace, then the call data is the init,
             // so to match with quickblocks, we just parse init
             if len(traces.Result[i].TraceAddress) == 0 {
                 if len(traces.Result[i].Action.Init) > 10 {
@@ -351,19 +302,25 @@ func getTraceAddresses(addresses map[string]bool, traces *BlockTraces, blockNum 
 
             // How can we check if the contract creation has failed?
             // If the contract throws during construction, then I don't get that address
-            // If this has failed, then I can get the 
+            // If this has failed, then I can get the
 
             // Handle contract creations that error out
-//            fmt.Println("i: |", i, "|")
-//            fmt.Println("traces.Result[i].Error: |", traces.Result[i].Error, "|")
-//            fmt.Println("traces.Result[i].Action.To: |", traces.Result[i].Action.To, "|")
-//            fmt.Println("traces.Result[i].Result.Address: |", traces.Result[i].Result.Address, "|")
             if traces.Result[i].Action.To == "" {
                 if traces.Result[i].Result.Address == "" {
                     if traces.Result[i].Error != "" {
-// getTransactionReceipt(traces.Result[i].TransactionHash)
-fmt.Println("This is one of the error creations", blockAndIdx)
-fmt.Println("Don't know how to use the result of getTransactionRecipt")
+                        bytes, err := getTransactionReceipt(traces.Result[i].TransactionHash)
+                        if err != nil {
+                            panic(err)
+                        }
+                        var receipt TransReceipt
+                        err = json.Unmarshal(bytes, &receipt)
+                        if err != nil {
+                            panic(err)
+                        }
+                        addr := receipt.Result.ContractAddress
+                        if isGood(addr) {
+                            addresses[addr+blockAndIdx] = true
+                        }
                     }
                 }
             }
@@ -400,9 +357,9 @@ func getLogAddresses(addresses map[string]bool, logs *BlockLogs, blockNum string
 
         blockAndIdx := "\t" + blockNum + "\t" + idx
 
-        for j := 0 ; j < len(logs.Result[i].Topics); j++ {
+        for j := 0; j < len(logs.Result[i].Topics); j++ {
             addr := string(logs.Result[i].Topics[j][2:])
-            if (isPotentialAddress(addr)) {
+            if isPotentialAddress(addr) {
                 addr = "0x" + string(addr[24:])
                 if isGood(addr) {
                     addresses[addr + blockAndIdx] = true
@@ -456,15 +413,15 @@ func writeAddresses(blockNum string, addresses map[string]bool) {
 
 func getAddress(traceAndLogs chan TraceAndLogs) {
     for blockTraceAndLog := range traceAndLogs {
-        //fmt.Println("Beginning Block Processing...")     
+        //fmt.Println("Beginning Block Processing...")
         // Set of 'address \t block \t txIdx'
         addresses := make(map[string]bool)
 
         // Parse the traces
         var traces BlockTraces
         err := json.Unmarshal(blockTraceAndLog.Traces, &traces)
-	    if err != nil {
-	    	panic(err)
+        if err != nil {
+            panic(err)
         }
         blockNum := leftZero(strconv.Itoa(traces.Result[0].BlockNumber), 9)
         getTraceAddresses(addresses, &traces, blockNum)
@@ -472,8 +429,8 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
         // Now, parse log data
         var logs BlockLogs
         err = json.Unmarshal(blockTraceAndLog.Logs, &logs)
-	    if err != nil {
-	    	panic(err)
+        if err != nil {
+            panic(err)
         }
         getLogAddresses(addresses, &logs, blockNum)
 
@@ -482,14 +439,12 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
     }
 }
 
-
 // Searching!
 
 type AddrSighting struct {
     block int
     txIdx int
 }
-
 
 func searchForAddress(address string, fileNames chan string, sightings chan AddrSighting) {
     for fileName := range fileNames {
@@ -500,8 +455,7 @@ func searchForAddress(address string, fileNames chan string, sightings chan Addr
         fmt.Print(string(data))
         sightings <- AddrSighting{0, 0}
     }
-} 
-
+}
 
 func testSearch() {
     fileNames := make(chan string)
@@ -541,7 +495,7 @@ func main() {
     for block := startBlock; block < startBlock + numBlocks; block++ {
         blocks <- block
     }
-    
+
     // blah, just wait around for ever (have to manuall terminate the process...)
     done := make(chan int)
     <- done 
