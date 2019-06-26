@@ -184,6 +184,13 @@ func leftZero(str string, totalLen int) string {
     return zeros + str
 }
 
+func isGood(addr string) bool {
+    if addr < "0x0000000000000000000000000000000000000009" {
+        return false
+    }
+    return true
+}
+
 func isPotentialAddress(addr string) bool {
 
     small := "00000000000000000000000000000000000000ffffffffffffffffffffffffff"
@@ -213,39 +220,59 @@ func getTraceAddresses(addresses map[string]bool, traces *BlockTraces, blockNum 
             for i := 0; i < len(inputData) / 64; i++ {
                 addr := string(inputData[i * 64:(i + 1) * 64])
                 if isPotentialAddress(addr) {
-                    addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                    addr = "0x" + string(addr[24:])
+                    if isGood(addr) {
+                        addresses[addr + blockAndIdx] = true
+                    }
                 }
             }
         }
         if traces.Result[i].Type == "call" {
             // If it's a call, get the to and from
             from := traces.Result[i].Action.From
+            if isGood(from) {
+                addresses[from + blockAndIdx] = true
+            }
             to := traces.Result[i].Action.To
-            addresses[from + blockAndIdx] = true
-            addresses[to + blockAndIdx] = true
+            if isGood(to) {
+                addresses[to + blockAndIdx] = true
+            }
+
         } else if traces.Result[i].Type == "reward" {
             if traces.Result[i].Action.RewardType == "block" {
                 author := traces.Result[i].Action.Author
-                addresses[author + "\t" + blockNum + "\t" + "99999"] = true
+                if isGood(author) {
+                    addresses[author + "\t" + blockNum + "\t" + "99999"] = true
+                }
             } else if traces.Result[i].Action.RewardType == "uncle" {
 
                 //author := traces.Result[i].Action.Author
-                //addresses[author + "\t" + blockNum + "\t" + "99998"] = true
+                //if isGood(author) {
+                //  addresses[author + "\t" + blockNum + "\t" + "99998"] = true
+                //}
             } else {
                 fmt.Println("New type of reward", traces.Result[i].Action.RewardType)
             }
         } else if traces.Result[i].Type == "suicide" {
             // add the contract that died, and where it sent it's money
             address := traces.Result[i].Action.Address
+            if isGood(address) {
+                addresses[address + blockAndIdx] = true
+            }
             refundAddress := traces.Result[i].Action.RefundAddress
-            addresses[address + blockAndIdx] = true
-            addresses[refundAddress + blockAndIdx] = true
+            if isGood(refundAddress) {
+                addresses[refundAddress + blockAndIdx] = true
+            }
         } else if traces.Result[i].Type == "create" {
             // add the creator, and the new address name
             from := traces.Result[i].Action.From
+            if isGood(from) {
+                addresses[from + blockAndIdx] = true
+            }
             address := traces.Result[i].Result.Address
-            addresses[from + blockAndIdx] = true
-            addresses[address + blockAndIdx] = true
+            if isGood(address) {
+                addresses[address + blockAndIdx] = true
+            }
 
             // If it's a top level trace, then the call data is the init, 
             // so to match with quickblocks, we just parse init
@@ -255,7 +282,10 @@ func getTraceAddresses(addresses map[string]bool, traces *BlockTraces, blockNum 
                     for i := 0; i < len(initData) / 64; i++ {
                         addr := string(initData[i * 64:(i + 1) * 64])
                         if isPotentialAddress(addr) {
-                            addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                            addr = "0x" + string(addr[24:])
+                            if isGood(addr) {
+                                addresses[addr + blockAndIdx] = true
+                            }
                         }
                     }
                 }
@@ -277,7 +307,10 @@ func getTraceAddresses(addresses map[string]bool, traces *BlockTraces, blockNum 
             for i := 0; i < len(outputData) / 64; i++ {
                 addr := string(outputData[i * 64:(i + 1) * 64])
                 if isPotentialAddress(addr) {
-                    addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                    addr = "0x" + string(addr[24:])
+                    if isGood(addr) {
+                        addresses[addr + blockAndIdx] = true
+                    }
                 }
             }
         }
@@ -294,11 +327,14 @@ func getLogAddresses(addresses map[string]bool, logs *BlockLogs, blockNum string
         idx := leftZero(strconv.FormatInt(idxInt, 10), 5)
 
         blockAndIdx := "\t" + blockNum + "\t" + idx
-        
+
         for j := 0 ; j < len(logs.Result[i].Topics); j++ {
             addr := string(logs.Result[i].Topics[j][2:])
             if (isPotentialAddress(addr)) {
-                addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                addr = "0x" + string(addr[24:])
+                if isGood(addr) {
+                    addresses[addr + blockAndIdx] = true
+                }
             }
         }
 
@@ -307,7 +343,10 @@ func getLogAddresses(addresses map[string]bool, logs *BlockLogs, blockNum string
             for i := 0; i < len(inputData) / 64; i++ {
                 addr := string(inputData[i * 64:(i + 1) * 64])
                 if isPotentialAddress(addr) {
-                    addresses["0x" + string(addr[24:]) + blockAndIdx] = true
+                    addr = "0x" + string(addr[24:])
+                    if isGood(addr) {
+                        addresses[addr + blockAndIdx] = true
+                    }
                 }
             }
         }
@@ -340,13 +379,12 @@ func writeAddresses(blockNum string, addresses map[string]bool) {
     if err != nil {
         fmt.Println("Error writing file:", err)
     }
-    fmt.Println("Finished Block Processing:", blockNum)
-
+    fmt.Print("Finished Block Processing:", blockNum, "\r")
 }
 
 func getAddress(traceAndLogs chan TraceAndLogs) {
     for blockTraceAndLog := range traceAndLogs {
-        fmt.Println("Beginning Block Processing...")     
+        //fmt.Println("Beginning Block Processing...")     
         // Set of 'address \t block \t txIdx'
         addresses := make(map[string]bool)
 
@@ -412,7 +450,7 @@ func testSearch() {
 
 func main() {
     //testSearch()
-    
+
     startBlock := 5000000
     numBlocks := 250000
 
