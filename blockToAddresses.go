@@ -89,7 +89,6 @@ func getLogsForBlock(blockNum int) ([]byte, error) {
     req.Header.Set("Content-Type", "application/json")
 
     resp, err := http.DefaultClient.Do(req)
-
     if err != nil {
         return nil, err
     }
@@ -101,6 +100,42 @@ func getLogsForBlock(blockNum int) ([]byte, error) {
     defer resp.Body.Close()
 
     return logsBody, nil
+}
+
+// Returns recipt for a given transaction -- only used in errored contract creations
+func getTransactionReceipt(string hash) ([]byte, error) {
+    data := JSONPayload {
+        "2.0",
+        "eth_getTransactionReceipt",
+        Params{hash},
+        2,
+    }
+
+    payloadBytes, err := json.Marshal(data)
+    if err != nil {
+        return nil, err
+    }
+
+    body := bytes.NewReader(payloadBytes)
+
+    req, err := http.NewRequest("POST", "http://localhost:8545", body)
+    if err != nil {
+        return nil, err
+    }
+    req.Header.Set("Content-Type", "application/json")
+
+    resp, err := http.DefaultClient.Do(req)
+    if err != nil {
+        return nil, err
+    }
+
+    receiptBody, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        return nil, err
+    }
+    defer resp.Body.Close()
+
+    return receiptBody, nil
 }
 
 type TraceAndLogs struct {
@@ -119,7 +154,6 @@ func getTraceAndLogs(blocks chan int, traceAndLogs chan TraceAndLogs) {
         if err != nil {
             panic(err)
         }
-
         traceAndLogs <- TraceAndLogs{traces, logs}
     }
 }
@@ -143,6 +177,7 @@ type BlockTraces struct {
 		} `json:"action,omitempty"`
 		BlockHash   string `json:"blockHash"`
 		BlockNumber int    `json:"blockNumber"`
+        Error       string `json:"error"`
 		Result      struct {
 			GasUsed string `json:"gasUsed"` // call
             Output  string `json:"output"`
@@ -173,6 +208,26 @@ type BlockLogs struct {
 		Type                string   `json:"type"`
 	} `json:"result"`
 	ID int `json:"id"`
+}
+
+type TransReceipt struct {
+    Jsonrpc string `json:"jsonrpc"`
+    Result  struct {
+        BlockHash         string        `json:"blockHash"`
+        BlockNumber       string        `json:"blockNumber"`
+        ContractAddress   string        `json:"contractAddress"`
+        CumulativeGasUsed string        `json:"cumulativeGasUsed"`
+        From              string        `json:"from"`
+        GasUsed           string        `json:"gasUsed"`
+        Logs              []interface{} `json:"logs"`
+        LogsBloom         string        `json:"logsBloom"`
+        Root              string        `json:"root"`
+        Status            interface{}   `json:"status"`
+        To                interface{}   `json:"to"`
+        TransactionHash   string        `json:"transactionHash"`
+        TransactionIndex  string        `json:"transactionIndex"`
+    } `json:"result"`
+    ID string `json:"id"`
 }
 
 func leftZero(str string, totalLen int) string {
@@ -210,6 +265,7 @@ func isPotentialAddress(addr string) bool {
 func getTraceAddresses(addresses map[string]bool, traces *BlockTraces, blockNum string) {
 
     for i :=0; i < len(traces.Result); i++ {
+
         idx := leftZero(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
 
         blockAndIdx := "\t" + blockNum + "\t" + idx
@@ -227,6 +283,7 @@ func getTraceAddresses(addresses map[string]bool, traces *BlockTraces, blockNum 
                 }
             }
         }
+
         if traces.Result[i].Type == "call" {
             // If it's a call, get the to and from
             from := traces.Result[i].Action.From
@@ -263,6 +320,7 @@ func getTraceAddresses(addresses map[string]bool, traces *BlockTraces, blockNum 
             if isGood(refundAddress) {
                 addresses[refundAddress + blockAndIdx] = true
             }
+
         } else if traces.Result[i].Type == "create" {
             // add the creator, and the new address name
             from := traces.Result[i].Action.From
@@ -295,6 +353,18 @@ func getTraceAddresses(addresses map[string]bool, traces *BlockTraces, blockNum 
             // If the contract throws during construction, then I don't get that address
             // If this has failed, then I can get the 
 
+            // Handle contract creations that error out
+            fmt.Println("i: |", i, "|")
+            fmt.Println("traces.Result[i].Error: |", traces.Result[i].Error, "|")
+            fmt.Println("traces.Result[i].Action.To: |", traces.Result[i].Action.To, "|")
+            fmt.Println("traces.Result[i].Result.Address: |", traces.Result[i].Result.Address, "|")
+            if traces.Result[i].Action.To == "" {
+                if traces.Result[i].Result.Address == "" {
+                    if traces.Result[i].Error != "" {
+fmt.Println("This is one of the error creations", blockAndIdx)
+                    }
+                }
+            }
 
         } else {
             fmt.Println("New trace type:", traces.Result[i].Type)
@@ -379,7 +449,7 @@ func writeAddresses(blockNum string, addresses map[string]bool) {
     if err != nil {
         fmt.Println("Error writing file:", err)
     }
-    fmt.Print("Finished Block Processing:", blockNum, "\r")
+    fmt.Print("Finished Block Processing:", blockNum, "\n")
 }
 
 func getAddress(traceAndLogs chan TraceAndLogs) {
@@ -451,8 +521,8 @@ func testSearch() {
 func main() {
     //testSearch()
 
-    startBlock := 5000000
-    numBlocks := 250000
+    startBlock := 224793
+    numBlocks := 1 //00
 
     blocks := make(chan int)
     traceAndLogs := make(chan TraceAndLogs)
