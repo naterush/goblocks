@@ -103,7 +103,7 @@ func getLogsForBlock(blockNum int) ([]byte, error) {
 }
 
 // Returns recipt for a given transaction -- only used in errored contract creations
-func getTransactionReceipt(string hash) ([]byte, error) {
+func getTransactionReceipt(hash string) ([]byte, error) {
     data := JSONPayload {
         "2.0",
         "eth_getTransactionReceipt",
