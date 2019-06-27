@@ -383,7 +383,7 @@ type AddrSighting struct {
 
 func searchForAddress(address string, fileNames chan string, sightings chan AddrSighting) {
     for fileName := range fileNames {
-        data, err := ioutil.ReadFile("block/" + fileName)
+        data, err := ioutil.ReadFile(fileName)
         if err != nil {
             fmt.Println("Error:", err)
         }
@@ -411,8 +411,9 @@ func testSearch() {
 }
 
 func main() {
-    //testSearch()
+    testSearch()
     
+    /*
     startBlock := 5000000
     numBlocks := 250000
 
@@ -434,5 +435,5 @@ func main() {
     
     // blah, just wait around for ever (have to manuall terminate the process...)
     done := make(chan int)
-    <- done 
+    <- done */
 }
