@@ -7,10 +7,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
-	"path/filepath"
 )
 
 // Params - used in calls to the RPC
@@ -526,16 +526,12 @@ func testSearch() {
 
 	root := "/home/jrush/goblocks/blocks"
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		fmt.Println(path)
-        return nil
-    })
-    if err != nil {
-        panic(err)
-    }
-
-	for i := 6000000; i < 6000000+10000; i++ {
-		fileName := leftZero(strconv.Itoa(i), 9) + ".txt"
-		fileNames <- fileName
+		if strings.HasSuffix(path, ".txt") {
+			fileNames <- path
+		}
+	})
+	if err != nil {
+		panic(err)
 	}
 
 	done := make(chan int)
@@ -568,5 +564,5 @@ func main() {
 	   // blah, just wait around for ever (have to manuall terminate the process...)
 	   done := make(chan int)
 	   <- done
-	   */
+	*/
 }
