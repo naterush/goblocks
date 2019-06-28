@@ -515,7 +515,7 @@ func searchForAddress(address string, fileNames chan string, sightings chan Addr
 	for fileName := range fileNames {
 		fmt.Print(fileName)
 
-		data, err := ioutil.ReadFile(fileName)
+		_, err := ioutil.ReadFile(fileName)
 		if err != nil {
 			fmt.Println("Error:", err)
 		}
