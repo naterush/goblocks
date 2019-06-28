@@ -520,12 +520,12 @@ func searchForAddress(address string, fileNames chan string, sightings chan Addr
 		if err != nil {
 			fmt.Println("ERROR:", err)
 		}
-		defer f.Close() // this needs to be after the err check
 
 		lines, err := csv.NewReader(f).ReadAll()
 		if err != nil {
 			fmt.Println("ERROR:", err)
 		}
+		f.Close()
 
 		// Binary search for addresses
 		i := sort.Search(len(lines), func(i int) bool { return lines[i][0] >= address })
