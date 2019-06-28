@@ -528,7 +528,7 @@ func testSearch() {
 	fileNames := make(chan string)
 	sightings := make(chan AddrSighting)
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		go searchForAddress("0xe3e1d847f4d369faa89b01393b34a8193da6dead", fileNames, sightings)
 	}
 
