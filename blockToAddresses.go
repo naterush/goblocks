@@ -507,7 +507,7 @@ type AddrSighting struct {
 
 func getAllSightings(sightings chan AddrSighting) {
 	for sighting := range sightings {
-		print(sighting)
+		fmt.Println(sighting)
 	}
 }
 
