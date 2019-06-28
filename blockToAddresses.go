@@ -529,6 +529,7 @@ func testSearch() {
 		if strings.HasSuffix(path, ".txt") {
 			fileNames <- path
 		}
+		return nil
 	})
 	if err != nil {
 		panic(err)
