@@ -12,8 +12,10 @@ import (
 	"strings"
 )
 
+// Params - used in calls to the RPC
 type Params []interface{}
 
+// JSONPayload - used to build requests to the RPC
 type JSONPayload struct {
 	Jsonrpc string `json:"jsonrpc"`
 	Method  string `json:"method"`
@@ -21,7 +23,7 @@ type JSONPayload struct {
 	ID      int `json:"id"`
 }
 
-// Returns all traces for a given block
+// getTracesForBlock - Returns all traces for a given block
 func getTracesForBlock(blockNum int) ([]byte, error) {
 	hexBlockNum := fmt.Sprintf("0x%x", blockNum)
 
@@ -59,6 +61,7 @@ func getTracesForBlock(blockNum int) ([]byte, error) {
 	return tracesBody, nil
 }
 
+// Filter - Sent to getLogs to specify block range
 type Filter struct {
 	Fromblock string `json:"fromBlock"`
 	Toblock   string `json:"toBlock"`
@@ -139,6 +142,7 @@ func getTransactionReceipt(hash string) ([]byte, error) {
 	return receiptBody, nil
 }
 
+// TraceAndLogs - carries both the traces and the logs for a block
 type TraceAndLogs struct {
 	Traces []byte
 	Logs   []byte
@@ -160,6 +164,7 @@ func getTraceAndLogs(blocks chan int, traceAndLogs chan TraceAndLogs) {
 	}
 }
 
+// BlockTraces - all traces in a block
 type BlockTraces struct {
 	Jsonrpc string `json:"jsonrpc"`
 	Result  []struct {
@@ -193,6 +198,7 @@ type BlockTraces struct {
 	ID int `json:"id"`
 }
 
+// BlockLogs - all logs in a block
 type BlockLogs struct {
 	Jsonrpc string `json:"jsonrpc"`
 	Result  []struct {
@@ -451,6 +457,7 @@ func getAddress(traceAndLogs chan TraceAndLogs) {
 
 // Searching!
 
+// AddrSighting - An appearance of an address
 type AddrSighting struct {
 	block int
 	txIdx int
