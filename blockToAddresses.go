@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"path/filepath"
 )
 
 // Params - used in calls to the RPC
@@ -522,6 +523,15 @@ func testSearch() {
 	for i := 0; i < 10; i++ {
 		go searchForAddress("0xe3e1d847f4d369faa89b01393b34a8193da6dead", fileNames, sightings)
 	}
+
+	root := "/home/jrush/goblocks/blocks"
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		fmt.Println(path)
+        return nil
+    })
+    if err != nil {
+        panic(err)
+    }
 
 	for i := 6000000; i < 6000000+10000; i++ {
 		fileName := leftZero(strconv.Itoa(i), 9) + ".txt"
