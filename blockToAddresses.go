@@ -513,11 +513,13 @@ func getAllSightings(sightings chan AddrSighting) {
 
 func searchForAddress(address string, fileNames chan string, sightings chan AddrSighting) {
 	for fileName := range fileNames {
+		fmt.Print(fileName)
+
 		data, err := ioutil.ReadFile(fileName)
 		if err != nil {
 			fmt.Println("Error:", err)
 		}
-		fmt.Print(string(data))
+		//fmt.Print(string(data))
 		sightings <- AddrSighting{0, 0}
 	}
 }
