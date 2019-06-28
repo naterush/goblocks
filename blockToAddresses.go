@@ -184,6 +184,7 @@ type BlockTraces struct {
 		} `json:"action,omitempty"`
 		BlockHash   string `json:"blockHash"`
 		BlockNumber int    `json:"blockNumber"`
+		Error       string `json:"error"`
 		Result      struct {
 			GasUsed string `json:"gasUsed"` // call
 			Output  string `json:"output"`
