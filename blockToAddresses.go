@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -506,8 +507,8 @@ type AddrSighting struct {
 }
 
 func getAllSightings(sightings chan AddrSighting) {
-	for _ = range sightings {
-		//fmt.Println(sighting)
+	for sighting := range sightings {
+		fmt.Println(sighting)
 	}
 }
 
@@ -515,12 +516,30 @@ func searchForAddress(address string, fileNames chan string, sightings chan Addr
 	for fileName := range fileNames {
 		fmt.Println(fileName)
 
-		_, err := ioutil.ReadFile(fileName)
+		f, err := os.Open(fileName)
 		if err != nil {
-			fmt.Println("Error:", err)
+			fmt.Println("ERROR:", err)
 		}
-		//fmt.Print(string(data))
-		sightings <- AddrSighting{0, 0}
+		defer f.Close() // this needs to be after the err check
+
+		lines, err := csv.NewReader(f).ReadAll()
+		if err != nil {
+			fmt.Println("ERROR:", err)
+		}
+
+		// Binary search for addresses
+		i := sort.Search(len(lines), func(i int) bool { return lines[i][0] >= address })
+		if i < len(lines) && lines[i][0] == address {
+			// found the address
+			block, err := strconv.Atoi(lines[i][1])
+			txIdx, err := strconv.Atoi(lines[i][2])
+			if err != nil {
+				fmt.Println("ERROR:", err)
+			}
+
+			// TODO: note that we didn't find every block it was included in
+			sightings <- AddrSighting{block, txIdx}
+		}
 	}
 }
 
@@ -528,7 +547,7 @@ func testSearch() {
 	fileNames := make(chan string)
 	sightings := make(chan AddrSighting)
 
-	for i := 0; i < 1; i++ {
+	for i := 0; i < 10; i++ {
 		go searchForAddress("0xe3e1d847f4d369faa89b01393b34a8193da6dead", fileNames, sightings)
 	}
 
