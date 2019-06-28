@@ -505,6 +505,12 @@ type AddrSighting struct {
 	txIdx int
 }
 
+func getAllSightings(sightings chan AddrSighting) {
+	for sighting := range sightings {
+		print(sighting)
+	}
+}
+
 func searchForAddress(address string, fileNames chan string, sightings chan AddrSighting) {
 	for fileName := range fileNames {
 		data, err := ioutil.ReadFile(fileName)
@@ -523,6 +529,8 @@ func testSearch() {
 	for i := 0; i < 10; i++ {
 		go searchForAddress("0xe3e1d847f4d369faa89b01393b34a8193da6dead", fileNames, sightings)
 	}
+
+	go getAllSightings(sightings)
 
 	root := "/home/jrush/goblocks/blocks"
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
