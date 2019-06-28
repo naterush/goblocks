@@ -514,7 +514,7 @@ func getAllSightings(sightings chan AddrSighting) {
 
 func searchForAddress(address string, fileNames chan string, sightings chan AddrSighting) {
 	for fileName := range fileNames {
-		fmt.Println(fileName)
+		//fmt.Println(fileName)
 
 		f, err := os.Open(fileName)
 		if err != nil {
@@ -548,7 +548,7 @@ func testSearch() {
 	sightings := make(chan AddrSighting)
 
 	for i := 0; i < 10; i++ {
-		go searchForAddress("0xe3e1d847f4d369faa89b01393b34a8193da6dead", fileNames, sightings)
+		go searchForAddress("0xc8883059be00EC5F708398369B857A7487130317", fileNames, sightings)
 	}
 
 	go getAllSightings(sightings)
