@@ -2,11 +2,13 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -473,6 +475,60 @@ func processBlocks(startBlock int, numBlocks int, skip int, nBlockProcesses int,
 	addressWG.Wait()
 }
 
+func getAllSightings(sightings chan AddrSighting) {
+	for sighting := range sightings {
+		fmt.Println(sighting)
+	}
+}
+
+func searchForAddress(address string, fileNames chan string, sightings chan AddrSighting) {
+	for fileName := range fileNames {
+		//fmt.Println(fileName)
+
+		f, err := os.Open(fileName)
+		if err != nil {
+			fmt.Println("ERROR:", err)
+		}
+
+		lines, err := csv.NewReader(f).ReadAll()
+		if err != nil {
+			fmt.Println("ERROR:", err)
+		}
+		f.Close()
+
+		// Binary search for addresses
+		i := sort.Search(len(lines), func(i int) bool { return lines[i][0] >= address })
+		if i < len(lines) && lines[i][0] == address {
+			// found the address
+			block, err := strconv.Atoi(lines[i][1])
+			txIdx, err := strconv.Atoi(lines[i][2])
+			if err != nil {
+				fmt.Println("ERROR:", err)
+			}
+
+			// TODO: note that we didn't find every block it was included in
+			sightings <- AddrSighting{block, txIdx}
+		}
+	}
+
+	for i := 0; i < 10; i++ {
+		go searchForAddress("0xc8883059be00EC5F708398369B857A7487130317", fileNames, sightings)
+	}
+
+	go getAllSightings(sightings)
+
+	root := "/home/jrush/goblocks/blocks"
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if strings.HasSuffix(path, ".txt") {
+			fileNames <- path
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+}
+		
 func padLeft(str string, totalLen int) string {
 	if len(str) >= totalLen {
 		return str
@@ -548,7 +604,14 @@ Description:
 
 var maxBlocks int
 
+<<<<<<< HEAD:cmd/scrape.go
 func init() {
 	rootCmd.AddCommand(scrapeCmd)
 	scrapeCmd.PersistentFlags().IntVarP(&maxBlocks, "maxBlocks", "m", 0, "The maximum number of blocks to scrape (default is to catch up).")
+=======
+	   // blah, just wait around for ever (have to manuall terminate the process...)
+	   done := make(chan int)
+	   <- done
+	*/
+>>>>>>> 47b1bc630c87281fb66408d7cec13aedbaf88aa4:blockToAddresses.go
 }
