@@ -19,9 +19,6 @@ var Verbose bool
 // RPCProvider location of node's RPC interface
 var RPCProvider string
 
-// CachePath location of TrueBlocks' cache
-var CachePath string
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "blaze",

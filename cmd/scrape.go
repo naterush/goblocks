@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"bytes"
-	"encoding/csv"
+//	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
+//	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -438,7 +438,7 @@ func writeAddresses(blockNum string, addressMap map[string]bool) {
 		os.MkdirAll(folderPath, os.ModePerm)
 	}
 
-	fileName := folderPath + "/" + blockNum + ".txt"
+	fileName := folderPath + blockNum + ".txt"
 	err := ioutil.WriteFile(fileName, toWrite, 0777)
 	if err != nil {
 		fmt.Println("Error writing file:", err)
@@ -475,6 +475,7 @@ func processBlocks(startBlock int, numBlocks int, skip int, nBlockProcesses int,
 	addressWG.Wait()
 }
 
+/*
 func getAllSightings(sightings chan AddrSighting) {
 	for sighting := range sightings {
 		fmt.Println(sighting)
@@ -528,7 +529,8 @@ func searchForAddress(address string, fileNames chan string, sightings chan Addr
 		panic(err)
 	}
 }
-		
+*/
+
 func padLeft(str string, totalLen int) string {
 	if len(str) >= totalLen {
 		return str
@@ -604,14 +606,7 @@ Description:
 
 var maxBlocks int
 
-<<<<<<< HEAD:cmd/scrape.go
 func init() {
 	rootCmd.AddCommand(scrapeCmd)
 	scrapeCmd.PersistentFlags().IntVarP(&maxBlocks, "maxBlocks", "m", 0, "The maximum number of blocks to scrape (default is to catch up).")
-=======
-	   // blah, just wait around for ever (have to manuall terminate the process...)
-	   done := make(chan int)
-	   <- done
-	*/
->>>>>>> 47b1bc630c87281fb66408d7cec13aedbaf88aa4:blockToAddresses.go
 }
