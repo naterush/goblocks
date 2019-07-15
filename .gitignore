@@ -1,3 +1,5 @@
+go.mod
+go.sum
 goblocks
 addr_index
 CMakeLists.txt
