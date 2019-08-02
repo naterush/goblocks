@@ -658,7 +658,7 @@ Description:
 		toScreen(Options.dockerMode, "  indexPath:", Options.indexPath, true)
 		toScreen(Options.dockerMode, "  ripePath:", Options.ripePath, true)
 		toScreen(Options.dockerMode, "  unripePath:", Options.unripePath, true)
-		toScreen(Options.dockerMode, "  dockerMode:", strconv.FormatBool(v), true)
+		toScreen(Options.dockerMode, "  dockerMode:", strconv.FormatBool(Options.dockerMode), true)
 		toScreen(Options.dockerMode, "  scraping:", "", false)
 		ProcessBlocks(
 			Options.rpcProvider,
