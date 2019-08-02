@@ -670,8 +670,7 @@ Description:
 			Options.nBlocks, 
 			Options.ripeBlock, 
 			Options.unripePath, 
-			Options.ripePath
-		)
+			Options.ripePath)
 		fmt.Println("")
 	},
 }
