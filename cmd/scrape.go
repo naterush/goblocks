@@ -300,7 +300,7 @@ func getTracesAndLogs(blockChannel chan int, addressChannel chan BlockInternals,
 	blockWG.Done()
 }
 
-func extractAddresses(addressChannel chan BlockInternals, addressWG *sync.WaitGroup) {
+func extractAddresses(addressChannel chan BlockInternals, addressWG *sync.WaitGroup, nBlocks int, ripeBlock int, unripePath int, ripePath int) {
 
 	for blockTraceAndLog := range addressChannel {
 		addressMap := make(map[string]bool)
@@ -521,7 +521,7 @@ func extractAddressesFromLogs(addressMap map[string]bool, logs *BlockLogs, block
 
 var counter = 0
 
-func writeAddresses(blockNum string, addressMap map[string]bool) {
+func writeAddresses(blockNum string, addressMap map[string]bool, nBlocks int, ripeBlock int, unripePath int, ripePath int) {
 
 	addressArray := make([]string, len(addressMap))
 	idx := 0
@@ -549,9 +549,9 @@ func writeAddresses(blockNum string, addressMap map[string]bool) {
 	//}
 	//
 	//fileName := Options.ripePath + blockNum + "_ts" + header.Result.Timestamp + ".txt"
-	fileName := Options.ripePath + blockNum + ".txt"
-	if bn > Options.ripeBlock {
-		fileName = Options.unripePath + blockNum + ".txt"
+	fileName := ripePath + blockNum + ".txt"
+	if bn > ripeBlock {
+		fileName = unripePath + blockNum + ".txt"
 	}
 
 	err := ioutil.WriteFile(fileName, toWrite, 0744)
@@ -560,7 +560,7 @@ func writeAddresses(blockNum string, addressMap map[string]bool) {
 		os.Exit(1) // caller will start over if this process exits with non-zero value
 	}
 	// Show twenty-five dots no matter how many blocks we're scraping
-	skip := Options.nBlocks / 50
+	skip := nBlocks / 50
 	if skip < 1 {
 		skip = 1
 	}
@@ -570,24 +570,24 @@ func writeAddresses(blockNum string, addressMap map[string]bool) {
 	}
 }
 
-func ProcessBlocks() {
+func ProcessBlocks(nBlockProcs int, nAddrProcs int, startBlock int, nBlocks int, ripeBlock int, unripePath int, ripePath int) {
 
 	blockChannel := make(chan int)
 	addressChannel := make(chan BlockInternals)
 
 	var blockWG sync.WaitGroup
-	blockWG.Add(Options.nBlockProcs)
-	for i := 0; i < Options.nBlockProcs; i++ {
+	blockWG.Add(nBlockProcs)
+	for i := 0; i < nBlockProcs; i++ {
 		go getTracesAndLogs(blockChannel, addressChannel, &blockWG)
 	}
 
 	var addressWG sync.WaitGroup
-	addressWG.Add(Options.nAddrProcs)
-	for i := 0; i < Options.nAddrProcs; i++ {
-		go extractAddresses(addressChannel, &addressWG)
+	addressWG.Add(nAddrProcs)
+	for i := 0; i < nAddrProcs; i++ {
+		go extractAddresses(addressChannel, &addressWG, nBlocks, ripeBlock, unripePath, ripePath)
 	}
 
-	for block := Options.startBlock; block < Options.startBlock+Options.nBlocks; block++ {
+	for block := startBlock; block < startBlock + nBlocks; block++ {
 		blockChannel <- block
 	}
 
@@ -652,7 +652,7 @@ Description:
   left off. 'Scrape' visits every block, queries that block's traces and logs
   looking for addresses, and writes an index of those addresses per transaction.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		toScreen("  options:", strconv.Itoa(Options.startBlock)+"/"+strconv.Itoa(Options.nBlocks)+"/"+strconv.Itoa(Options.ripeBlock), true)
+		toScreen("  options:", strconv.Itoa(Options.startBlock) + "/"+strconv.Itoa(Options.nBlocks)+"/"+strconv.Itoa(Options.ripeBlock), true)
 		toScreen("  processes:", strconv.Itoa(Options.nBlockProcs)+"/"+strconv.Itoa(Options.nAddrProcs), true)
 		toScreen("  rpcProvider:", Options.rpcProvider, true)
 		toScreen("  indexPath:", Options.indexPath, true)
@@ -662,7 +662,7 @@ Description:
 			toScreen("  dockerMode:", "true", true)
 		}
 		toScreen("  scraping:", "", false)
-		ProcessBlocks()
+		ProcessBlocks(Options.nBlockProcs, Options.nAddrProcs, Options.startBlock, Options.nBlocks, Options.ripeBlock, Options.unripePath, Options.ripePath)
 		fmt.Println("")
 	},
 }

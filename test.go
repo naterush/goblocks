@@ -1,5 +1,7 @@
 package main
 
+import "testing"
+
 func TestAbs(t *testing.T) {
     Options.rpcProvider = "http://localhost:8545"
     Options.indexPath = "./"
