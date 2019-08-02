@@ -570,7 +570,7 @@ func writeAddresses(blockNum string, addressMap map[string]bool) {
 	}
 }
 
-func processBlocks() {
+func ProcessBlocks() {
 
 	blockChannel := make(chan int)
 	addressChannel := make(chan BlockInternals)
@@ -662,7 +662,7 @@ Description:
 			toScreen("  dockerMode:", "true", true)
 		}
 		toScreen("  scraping:", "", false)
-		processBlocks()
+		ProcessBlocks()
 		fmt.Println("")
 	},
 }
