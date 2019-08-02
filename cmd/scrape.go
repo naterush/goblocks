@@ -330,7 +330,7 @@ func extractAddresses(addressChannel chan BlockInternals, addressWG *sync.WaitGr
 		}
 		if blockNum != "" {
 			extractAddressesFromLogs(addressMap, &logs, blockNum)
-			writeAddresses(blockNum, addressMap)
+			writeAddresses(blockNum, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
 		}
 	}
 	addressWG.Done()
