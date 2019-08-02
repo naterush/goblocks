@@ -300,7 +300,7 @@ func getTracesAndLogs(blockChannel chan int, addressChannel chan BlockInternals,
 	blockWG.Done()
 }
 
-func extractAddresses(addressChannel chan BlockInternals, addressWG *sync.WaitGroup, nBlocks int, ripeBlock int, unripePath int, ripePath int) {
+func extractAddresses(addressChannel chan BlockInternals, addressWG *sync.WaitGroup, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
 
 	for blockTraceAndLog := range addressChannel {
 		addressMap := make(map[string]bool)
@@ -521,7 +521,7 @@ func extractAddressesFromLogs(addressMap map[string]bool, logs *BlockLogs, block
 
 var counter = 0
 
-func writeAddresses(blockNum string, addressMap map[string]bool, nBlocks int, ripeBlock int, unripePath int, ripePath int) {
+func writeAddresses(blockNum string, addressMap map[string]bool, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
 
 	addressArray := make([]string, len(addressMap))
 	idx := 0
@@ -570,7 +570,7 @@ func writeAddresses(blockNum string, addressMap map[string]bool, nBlocks int, ri
 	}
 }
 
-func ProcessBlocks(nBlockProcs int, nAddrProcs int, startBlock int, nBlocks int, ripeBlock int, unripePath int, ripePath int) {
+func ProcessBlocks(nBlockProcs int, nAddrProcs int, startBlock int, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
 
 	blockChannel := make(chan int)
 	addressChannel := make(chan BlockInternals)
