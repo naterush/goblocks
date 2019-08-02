@@ -4,5 +4,5 @@ import "testing"
 import "fmt"
 
 func TestAbs(t *testing.T) {
-    fmt.Print("Here")
+    ProcessBlocks("http://localhost:8545", 5, 25, 0, 10000, 8000000, "./unripe", "./ripe")
 }
