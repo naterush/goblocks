@@ -142,9 +142,9 @@ type BlockInternals struct {
 }
 
 // toScreen Sends a prompt and a value to the screen (adjusts spacing if running from docker)
-func toScreen(prompt string, value string, newLine bool) {
+func toScreen(dockerMode bool, prompt string, value string, newLine bool) {
 	space1 := "\t"
-	if Options.dockerMode {
+	if dockerMode {
 		space1 = "   "
 	}
 	fmt.Print(space1, prompt, "\t", value)
@@ -154,7 +154,7 @@ func toScreen(prompt string, value string, newLine bool) {
 }
 
 // getBlockHeader Returns the block header for a given block.
-func getBlockHeader(blockNum int) ([]byte, error) {
+func getBlockHeader(rpcProvider string, blockNum int) ([]byte, error) {
 	payloadBytes, err := json.Marshal(RPCPayload{"2.0", "parity_getBlockHeaderByNumber", Params{fmt.Sprintf("0x%x", blockNum)}, 2})
 	if err != nil {
 		fmt.Println(err)
@@ -162,7 +162,7 @@ func getBlockHeader(blockNum int) ([]byte, error) {
 	}
 
 	body := bytes.NewReader(payloadBytes)
-	req, err := http.NewRequest("POST", Options.rpcProvider, body)
+	req, err := http.NewRequest("POST", rpcProvider, body)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -186,7 +186,7 @@ func getBlockHeader(blockNum int) ([]byte, error) {
 }
 
 // getTracesFromBlock Returns all traces for a given block.
-func getTracesFromBlock(blockNum int) ([]byte, error) {
+func getTracesFromBlock(rpcProvider string, blockNum int) ([]byte, error) {
 	payloadBytes, err := json.Marshal(RPCPayload{"2.0", "trace_block", Params{fmt.Sprintf("0x%x", blockNum)}, 2})
 	if err != nil {
 		fmt.Println(err)
@@ -194,7 +194,7 @@ func getTracesFromBlock(blockNum int) ([]byte, error) {
 	}
 
 	body := bytes.NewReader(payloadBytes)
-	req, err := http.NewRequest("POST", Options.rpcProvider, body)
+	req, err := http.NewRequest("POST", rpcProvider, body)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -218,7 +218,7 @@ func getTracesFromBlock(blockNum int) ([]byte, error) {
 }
 
 // getLogsFromBlock Returns all logs for a given block.
-func getLogsFromBlock(blockNum int) ([]byte, error) {
+func getLogsFromBlock(rpcProvider string, blockNum int) ([]byte, error) {
 	payloadBytes, err := json.Marshal(RPCPayload{"2.0", "eth_getLogs", Params{Filter{fmt.Sprintf("0x%x", blockNum), fmt.Sprintf("0x%x", blockNum)}}, 2})
 	if err != nil {
 		fmt.Println(err)
@@ -226,7 +226,7 @@ func getLogsFromBlock(blockNum int) ([]byte, error) {
 	}
 
 	body := bytes.NewReader(payloadBytes)
-	req, err := http.NewRequest("POST", Options.rpcProvider, body)
+	req, err := http.NewRequest("POST", rpcProvider, body)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -250,7 +250,7 @@ func getLogsFromBlock(blockNum int) ([]byte, error) {
 }
 
 // getTransactionReceipt Returns recipt for a given transaction -- only used in errored contract creations
-func getTransactionReceipt(hash string) ([]byte, error) {
+func getTransactionReceipt(rpcProvider string, hash string) ([]byte, error) {
 	payloadBytes, err := json.Marshal(RPCPayload{"2.0", "eth_getTransactionReceipt", Params{hash}, 2})
 	if err != nil {
 		fmt.Println(err)
@@ -258,7 +258,7 @@ func getTransactionReceipt(hash string) ([]byte, error) {
 	}
 
 	body := bytes.NewReader(payloadBytes)
-	req, err := http.NewRequest("POST", Options.rpcProvider, body)
+	req, err := http.NewRequest("POST", rpcProvider, body)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -282,15 +282,15 @@ func getTransactionReceipt(hash string) ([]byte, error) {
 }
 
 // getTracesAndLogs Process the block channel and for each block query the node for both traces and logs. Send results to addressChannel
-func getTracesAndLogs(blockChannel chan int, addressChannel chan BlockInternals, blockWG *sync.WaitGroup) {
+func getTracesAndLogs(rpcProvider string, blockChannel chan int, addressChannel chan BlockInternals, blockWG *sync.WaitGroup) {
 
 	for blockNum := range blockChannel {
-		traces, err := getTracesFromBlock(blockNum)
+		traces, err := getTracesFromBlock(rpcProvider, blockNum)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1) // caller will start over if this process exits with non-zero value
 		}
-		logs, err := getLogsFromBlock(blockNum)
+		logs, err := getLogsFromBlock(rpcProvider, blockNum)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1) // caller will start over if this process exits with non-zero value
@@ -300,7 +300,7 @@ func getTracesAndLogs(blockChannel chan int, addressChannel chan BlockInternals,
 	blockWG.Done()
 }
 
-func extractAddresses(addressChannel chan BlockInternals, addressWG *sync.WaitGroup, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
+func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, addressWG *sync.WaitGroup, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
 
 	for blockTraceAndLog := range addressChannel {
 		addressMap := make(map[string]bool)
@@ -315,7 +315,7 @@ func extractAddresses(addressChannel chan BlockInternals, addressWG *sync.WaitGr
 		blockNum := ""
 		if traces.Result != nil && len(traces.Result) > 0 {
 			blockNum = padLeft(strconv.Itoa(traces.Result[0].BlockNumber), 9)
-			extractAddressesFromTraces(addressMap, &traces, blockNum)
+			extractAddressesFromTraces(rpcProvider, addressMap, &traces, blockNum)
 		}
 
 		// Now, parse log data
@@ -336,7 +336,7 @@ func extractAddresses(addressChannel chan BlockInternals, addressWG *sync.WaitGr
 	addressWG.Done()
 }
 
-func extractAddressesFromTraces(addressMap map[string]bool, traces *BlockTraces, blockNum string) {
+func extractAddressesFromTraces(rpcProvider string, addressMap map[string]bool, traces *BlockTraces, blockNum string) {
 
 	for i := 0; i < len(traces.Result); i++ {
 
@@ -425,7 +425,7 @@ func extractAddressesFromTraces(addressMap map[string]bool, traces *BlockTraces,
 			if traces.Result[i].Action.To == "" {
 				if traces.Result[i].Result.Address == "" {
 					if traces.Result[i].Error != "" {
-						bytes, err := getTransactionReceipt(traces.Result[i].TransactionHash)
+						bytes, err := getTransactionReceipt(rpcProvider, traces.Result[i].TransactionHash)
 						if err != nil {
 							fmt.Println(err)
 							os.Exit(1) // caller will start over if this process exits with non-zero value
@@ -570,7 +570,7 @@ func writeAddresses(blockNum string, addressMap map[string]bool, nBlocks int, ri
 	}
 }
 
-func ProcessBlocks(nBlockProcs int, nAddrProcs int, startBlock int, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
+func ProcessBlocks(rpcProvider string, nBlockProcs int, nAddrProcs int, startBlock int, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
 
 	blockChannel := make(chan int)
 	addressChannel := make(chan BlockInternals)
@@ -578,13 +578,13 @@ func ProcessBlocks(nBlockProcs int, nAddrProcs int, startBlock int, nBlocks int,
 	var blockWG sync.WaitGroup
 	blockWG.Add(nBlockProcs)
 	for i := 0; i < nBlockProcs; i++ {
-		go getTracesAndLogs(blockChannel, addressChannel, &blockWG)
+		go getTracesAndLogs(rpcProvider, blockChannel, addressChannel, &blockWG)
 	}
 
 	var addressWG sync.WaitGroup
 	addressWG.Add(nAddrProcs)
 	for i := 0; i < nAddrProcs; i++ {
-		go extractAddresses(addressChannel, &addressWG, nBlocks, ripeBlock, unripePath, ripePath)
+		go extractAddresses(rpcProvider, addressChannel, &addressWG, nBlocks, ripeBlock, unripePath, ripePath)
 	}
 
 	for block := startBlock; block < startBlock + nBlocks; block++ {
@@ -652,17 +652,26 @@ Description:
   left off. 'Scrape' visits every block, queries that block's traces and logs
   looking for addresses, and writes an index of those addresses per transaction.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		toScreen("  options:", strconv.Itoa(Options.startBlock) + "/"+strconv.Itoa(Options.nBlocks)+"/"+strconv.Itoa(Options.ripeBlock), true)
-		toScreen("  processes:", strconv.Itoa(Options.nBlockProcs)+"/"+strconv.Itoa(Options.nAddrProcs), true)
-		toScreen("  rpcProvider:", Options.rpcProvider, true)
-		toScreen("  indexPath:", Options.indexPath, true)
-		toScreen("  ripePath:", Options.ripePath, true)
-		toScreen("  unripePath:", Options.unripePath, true)
+		toScreen(Options.dockerMode, "  options:", strconv.Itoa(Options.startBlock) + "/"+strconv.Itoa(Options.nBlocks)+"/"+strconv.Itoa(Options.ripeBlock), true)
+		toScreen(Options.dockerMode, "  processes:", strconv.Itoa(Options.nBlockProcs)+"/"+strconv.Itoa(Options.nAddrProcs), true)
+		toScreen(Options.dockerMode, "  rpcProvider:", Options.rpcProvider, true)
+		toScreen(Options.dockerMode, "  indexPath:", Options.indexPath, true)
+		toScreen(Options.dockerMode, "  ripePath:", Options.ripePath, true)
+		toScreen(Options.dockerMode, "  unripePath:", Options.unripePath, true)
 		if Options.dockerMode {
 			toScreen("  dockerMode:", "true", true)
 		}
 		toScreen("  scraping:", "", false)
-		ProcessBlocks(Options.nBlockProcs, Options.nAddrProcs, Options.startBlock, Options.nBlocks, Options.ripeBlock, Options.unripePath, Options.ripePath)
+		ProcessBlocks(
+			Options.rpcProvider,
+			Options.nBlockProcs, 
+			Options.nAddrProcs, 
+			Options.startBlock, 
+			Options.nBlocks, 
+			Options.ripeBlock, 
+			Options.unripePath, 
+			Options.ripePath
+		)
 		fmt.Println("")
 	},
 }
