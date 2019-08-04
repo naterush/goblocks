@@ -49,7 +49,7 @@ func TraceStateMachine(traces []byte) {
 	//closeBracketStraight := byte(93) // byte value of ] TODO: this might be wrong!, but i don't really need it
 
 	// Keep track of these indexes
-	MAX_ADDRESSES_IN_TRACE := 1000
+	const MAX_ADDRESSES_IN_TRACE := 1000
 	transactionPosition := 0
 	var addressesInTrace [MAX_ADDRESSES_IN_TRACE]string
 	addressesIndex := 0
