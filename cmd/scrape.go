@@ -377,7 +377,7 @@ func extractAddressesFromTracesNoJSON(blockStr string, traces []byte, addressMap
 	blockAndIdx := "\t" + blockStr + "\t" + indexString
 
 	
-	for index := 51; index < len(traces); index++ {
+	for index := 27; index < len(traces); index++ {
 		if traces[index] == openBracket {
 			nesting += 1
 		}
