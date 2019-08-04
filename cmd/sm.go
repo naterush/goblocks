@@ -6,6 +6,7 @@ import (
 
 
 func TraceStateMachine(traces []byte) {
+	fmt.Println(string(traces))
 	// Declare all the states we need
 	const (
 		STATE_START = iota
