@@ -305,7 +305,6 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 
 	for blockTraceAndLog := range addressChannel {
 		addressMap := make(map[string]bool)
-		extractAddressesNoJSON(blockTraceAndLog)
 
 		// Parse the traces
 		var traces BlockTraces
