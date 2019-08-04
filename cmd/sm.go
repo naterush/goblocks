@@ -131,9 +131,28 @@ func TraceStateMachine(traces []byte) map[string]bool {
 				state = STATE_START
 			case STATE_O:
 				fmt.Println("Should be output:", string(traces[index + 8: index + 10]))
-				// output
-				// Read in address
-				// move index forward
+				startIndex := index + 8
+				endIndex := index + 8
+				for j := startIndex; j < len(traces); j++ {
+					if traces[j] == comma {
+						endIndex = j
+						break
+					}
+				}
+
+				if startIndex + 10 < endIndex {
+					data := traces[startIndex + 10: endIndex]
+					for i := 0; i < len(data) / 64; i++ {
+						addr := string(data[i * 64 : (i + 1) * 64])
+						if potentialAddress(addr) {
+							addr = "0x" + string(addr[24:])
+							if goodAddr(addr) {
+								addressesInTrace[addressesIndex] = addr
+								addressesIndex += 1
+							}
+						}
+					}
+				}
 				state = STATE_START
 			default:
 				state = STATE_START
@@ -189,9 +208,29 @@ func TraceStateMachine(traces []byte) map[string]bool {
 				state = STATE_I
 			case STATE_N:
 				fmt.Println("Should be init:", string(traces[index + 5: index + 7]))
-				// init
-				// Read in address
-				// move index forward
+				startIndex := index + 5
+				endIndex := index + 5
+				for j := startIndex; j < len(traces); j++ {
+					if traces[j] == comma {
+						endIndex = j
+						break
+					}
+				}
+
+				if startIndex + 10 < endIndex {
+					data := traces[startIndex + 10: endIndex]
+					for i := 0; i < len(data) / 64; i++ {
+						addr := string(data[i * 64 : (i + 1) * 64])
+						if potentialAddress(addr) {
+							addr = "0x" + string(addr[24:])
+							if goodAddr(addr) {
+								addressesInTrace[addressesIndex] = addr
+								addressesIndex += 1
+							}
+						}
+					}
+				}
+
 				state = STATE_START
 			default:
 				state = STATE_START
@@ -207,9 +246,28 @@ func TraceStateMachine(traces []byte) map[string]bool {
 			switch state {
 			case STATE_N:
 				fmt.Println("Should be input:", string(traces[index + 6: index + 8]))
-				// input
-				// Read in address
-				// move index forward
+				startIndex := index + 6
+				endIndex := index + 6
+				for j := startIndex; j < len(traces); j++ {
+					if traces[j] == comma {
+						endIndex = j
+						break
+					}
+				}
+
+				if startIndex + 10 < endIndex {
+					data := traces[startIndex + 10: endIndex]
+					for i := 0; i < len(data) / 64; i++ {
+						addr := string(data[i * 64 : (i + 1) * 64])
+						if potentialAddress(addr) {
+							addr = "0x" + string(addr[24:])
+							if goodAddr(addr) {
+								addressesInTrace[addressesIndex] = addr
+								addressesIndex += 1
+							}
+						}
+					}
+				}
 				state = STATE_START
 			default:
 				state = STATE_START
@@ -237,4 +295,38 @@ func padLeft(str string, totalLen int) string {
 		zeros += "0"
 	}
 	return zeros + str
+}
+
+
+// goodAddr Returns true if the address is not a precompile and not zero
+func goodAddr(addr string) bool {
+	// As per EIP 1352, all addresses less than the following value are reserved
+	// for pre-compiles. We don't index precompiles.
+	if addr < "0x000000000000000000000000000000000000ffff" {
+		return false
+	}
+	return true
+}
+
+// potentialAddress Processing 'input' value, 'output' value or event 'data' value
+// we do our best, but we don't include everything we could. We do the best we can
+func potentialAddress(addr string) bool {
+	// Any address smaller than this we call a 'baddress' and do not index
+	small := "00000000000000000000000000000000000000ffffffffffffffffffffffffff"
+	//        -------+-------+-------+-------+-------+-------+-------+-------+
+	if addr <= small {
+		return false
+	}
+
+	// Any address with less than this many leading zeros is not an left-padded 20-byte address
+	largePrefix := "000000000000000000000000"
+	//              -------+-------+-------+
+	if !strings.HasPrefix(addr, largePrefix) {
+		return false
+	}
+
+	if strings.HasSuffix(addr, "00000000") {
+		return false
+	}
+	return true
 }
