@@ -124,7 +124,7 @@ func TraceStateMachine(traces []byte) map[string]bool {
 			switch state {
 			case STATE_A:
 				fmt.Println("From author:", string(traces[index + 8: index + 8 + 42]))
-				addressMap[string(traces[index + 8: index + 8 + 42]) + "\t" + blockNumStr + "\t" + "99999"]
+				addressMap[string(traces[index + 8: index + 8 + 42]) + "\t" + blockNumStr + "\t" + "99999"] = true
 				// author
 				// Read in address
 				// move index forward
