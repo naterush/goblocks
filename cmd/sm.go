@@ -6,7 +6,6 @@ import (
 
 
 func TraceStateMachine(traces []byte) {
-	fmt.Println(string(traces))
 	// Declare all the states we need
 	const (
 		STATE_START = iota
@@ -50,7 +49,6 @@ func TraceStateMachine(traces []byte) {
 
 		switch token {
 		case t:
-			fmt.Println("t")
 			switch state {
 			case STATE_START:
 				state = STATE_T
@@ -60,7 +58,6 @@ func TraceStateMachine(traces []byte) {
 				state = STATE_START
 			}
 		case o:
-			fmt.Println("o")
 			switch state {
 			case STATE_START:
 				state = STATE_O
@@ -75,7 +72,6 @@ func TraceStateMachine(traces []byte) {
 				state = STATE_START
 			}
 		case a:
-			fmt.Println("a")
 			switch state {
 			case STATE_START:
 				state = STATE_A
@@ -83,7 +79,6 @@ func TraceStateMachine(traces []byte) {
 				state = STATE_START
 			}
 		case u:
-			fmt.Println("u")
 			switch state {
 			case STATE_A:
 				fmt.Println("Should be author:", string(traces[index - 2: index + 4]))
@@ -101,7 +96,6 @@ func TraceStateMachine(traces []byte) {
 				state = STATE_START
 			}
 		case d:
-			fmt.Println("d")
 			switch state {
 			case STATE_A:
 				state = STATE_D
@@ -111,7 +105,6 @@ func TraceStateMachine(traces []byte) {
 				state = STATE_START
 			}
 		case r:
-			fmt.Println("r")
 			switch state {
 			case STATE_START:
 				state = STATE_R
@@ -131,7 +124,6 @@ func TraceStateMachine(traces []byte) {
 				state = STATE_START
 			}
 		case e:
-			fmt.Println("e")
 			switch state {
 			case STATE_R:
 				state = STATE_E
@@ -139,7 +131,6 @@ func TraceStateMachine(traces []byte) {
 				state = STATE_START
 			}
 		case f:
-			fmt.Println("f")
 			switch state {
 			case STATE_START:
 				state = STATE_F
@@ -153,7 +144,6 @@ func TraceStateMachine(traces []byte) {
 				state = STATE_START
 			}
 		case i:
-			fmt.Println("i")
 			switch state {
 			case STATE_START:
 				state = STATE_I
@@ -167,7 +157,6 @@ func TraceStateMachine(traces []byte) {
 				state = STATE_START
 			}
 		case n:
-			fmt.Println("n")
 			switch state {
 			case STATE_I:
 				state = STATE_N
@@ -175,7 +164,6 @@ func TraceStateMachine(traces []byte) {
 				state = STATE_START
 			}
 		case p:
-			fmt.Println("p")
 			switch state {
 			case STATE_N:
 				fmt.Println("Should be input:", string(traces[index - 3: index + 2]))
@@ -186,7 +174,9 @@ func TraceStateMachine(traces []byte) {
 			default:
 				state = STATE_START
 			}
+		default:
+			state = STATE_START
 		}
+
 	}
-	fmt.Println(string(traces))
 }
