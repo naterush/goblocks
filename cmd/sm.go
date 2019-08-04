@@ -5,7 +5,7 @@ import (
 )
 
 
-func TraceStateMachine(traces []byte) map[int]string {
+func TraceStateMachine(traces []byte) map[string]bool {
 	// Declare all the states we need
 	const (
 		STATE_START = iota
