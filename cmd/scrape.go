@@ -393,7 +393,7 @@ func extractAddressesFromTracesNoJSON(blockStr string, traces []byte, addressMap
 		for _, keywordPtr := range followedByAddress {
 			if bytes.HasPrefix(traces[index:], *keywordPtr) {
 				address := string(traces[index + 8:index + 50])
-				addressMap[address + blockAndIdx]
+				addressMap[address + blockAndIdx] = true
 			}
 		
 		}
