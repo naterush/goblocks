@@ -152,8 +152,8 @@ func TraceStateMachine(traces []byte) map[string]bool {
 			case STATE_START:
 				state = STATE_R
 			case STATE_D_AFTER_D:
-				fmt.Println("Should be address:", string(traces[index + 9: index + 9 + 42]))
-				addressesInTrace[addressesIndex] = string(traces[index + 9: index + 9 + 42])
+				fmt.Println("Should be address:", string(traces[index + 7: index + 7 + 42]))
+				addressesInTrace[addressesIndex] = string(traces[index + 7: index + 7 + 42])
 				addressesIndex += 1
 				state = STATE_START
 			case STATE_F:
