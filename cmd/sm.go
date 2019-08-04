@@ -124,8 +124,7 @@ func TraceStateMachine(traces []byte) map[int]string {
 			switch state {
 			case STATE_A:
 				fmt.Println("From author:", string(traces[index + 8: index + 8 + 42]))
-				addressesInTrace[addressesIndex] = string(traces[index + 8: index + 8 + 42])
-				addressesIndex += 1
+				addressMap[string(traces[index + 8: index + 8 + 42]) + "\t" + blockNumStr + "\t" + "99999"]
 				// author
 				// Read in address
 				// move index forward
@@ -156,17 +155,11 @@ func TraceStateMachine(traces []byte) map[int]string {
 				fmt.Println("Should be address:", string(traces[index + 9: index + 9 + 42]))
 				addressesInTrace[addressesIndex] = string(traces[index + 9: index + 9 + 42])
 				addressesIndex += 1
-				// address
-				// Read in address
-				// move index forward
 				state = STATE_START
 			case STATE_F:
 				fmt.Println("Should be from:", string(traces[index + 6: index + 6 + 42]))
 				addressesInTrace[addressesIndex] = string(traces[index + 6: index + 6 + 42])
 				addressesIndex += 1
-				// from
-				// Read in address
-				// move index forward
 				state = STATE_START
 			default:
 				state = STATE_START
@@ -186,9 +179,6 @@ func TraceStateMachine(traces []byte) map[int]string {
 				fmt.Println("Should be refundAddress:", string(traces[index + 15: index + 15 + 42]))
 				addressesInTrace[addressesIndex] = string(traces[index + 15: index + 15 + 42])
 				addressesIndex += 1
-				// refundAddress
-				// Read in address
-				// move index forward
 				state = STATE_START
 			default:
 				state = STATE_START

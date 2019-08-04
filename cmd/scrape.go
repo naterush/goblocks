@@ -319,7 +319,8 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			extractAddressesFromTraces(rpcProvider, addressMap, &traces, blockNum)
 		}
 		writeAddresses(blockNum, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
-		TraceStateMachine(blockTraceAndLog.Traces)
+		newAddressMap := TraceStateMachine(blockTraceAndLog.Traces)
+		writeAddresses(blockNum, newAddressMap, nBlocks, ripeBlock, unripePath, ripePath)
 		/*
 		// Now, parse log data
 		var logs BlockLogs
