@@ -319,9 +319,8 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			blockNum = padLeft(strconv.Itoa(traces.Result[0].BlockNumber), 9)
 			extractAddressesFromTraces(rpcProvider, addressMap, &traces, blockNum)
 		}
-		addressMapNew := extractAddressesNoJSON(blockTraceAndLog)
 		writeAddresses(blockNum, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
-		writeAddresses(blockNum + "TEST", addressMapNew, nBlocks, ripeBlock, unripePath, ripePath)
+		TraceStateMachine(blockTraceAndLog.Traces)
 		/*
 		// Now, parse log data
 		var logs BlockLogs
@@ -340,96 +339,6 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 
 	}
 	addressWG.Done()
-}
-
-func extractAddressesNoJSON(blockTraceAndLog BlockInternals) map[string]bool {
-	addressMap := make(map[string]bool)
-	blockStr := padLeft(strconv.Itoa(blockTraceAndLog.BlockNum), 9)
-
-	// then we extract the addresses from the traces
-	extractAddressesFromTracesNoJSON(blockStr, blockTraceAndLog.Traces, addressMap)
-
-	// then we extract the addresses from the logs
-	//extractAddressesFromLogsNoJSON(blockStr, blockTraceAndLog.Traces, addressMap)
-	return addressMap
-}
-
-func extractAddressesFromTracesNoJSON(blockStr string, traces []byte, addressMap map[string]bool) {
-	fmt.Println(string(traces))
-	to := []byte("to")
-	from := []byte("from")
-	author := []byte("author")
-	address := []byte("address")
-	refundAddress := []byte("refundAddress")
-	followedByAddress := []*[]byte{&to, &from, &author, &address, &refundAddress}
-	init := []byte("init")
-	input := []byte("input")
-	output := []byte("output")
-	followedByData := []*[]byte{&init, &input, &output}
-	quote := byte(34) // byte value of "
-	openBracket := byte(123) // byte value of {
-	closeBracket := byte(125) // byte value of }
-
-	
-	nesting := 0 // whenever nesting returns to 0, we update transaction position by one
-	transactionIndex := 0 
-	indexString := padLeft(strconv.Itoa(0), 5)
-	blockAndIdx := "\t" + blockStr + "\t" + indexString
-
-	
-	for index := 27; index < len(traces); index++ {
-		if traces[index] == openBracket {
-			nesting += 1
-		}
-		if traces[index] == closeBracket {
-			nesting -= 1
-		}
-		if nesting == 0 && traces[index - 1] == closeBracket {
-			transactionIndex += 1
-			indexString = padLeft(strconv.Itoa(transactionIndex), 5)
-			blockAndIdx = "\t" + blockStr + "\t" + indexString
-		}
-		
-	
-		for _, keywordPtr := range followedByAddress {
-			if bytes.HasPrefix(traces[index:], *keywordPtr) {
-				address := string(traces[index + 3 + len(*keywordPtr):index + 45 + len(*keywordPtr)])
-				addressMap[address + blockAndIdx] = true
-			}
-		
-		}
-		for _, keywordPtr := range followedByData {
-			if bytes.HasPrefix(traces[index:], *keywordPtr) {
-				startIndex := 0
-				endIndex := 0
-				numQuotes := 0
-				for j := index; j < len(traces); j++ {
-					if traces[j] == quote {
-						numQuotes += 1
-					}
-					if numQuotes == 2 {
-						startIndex = j - 1
-					}
-					if numQuotes == 3 {
-						endIndex = j
-						break
-					}
-				}
-				if (startIndex + 10 < endIndex) {
-					inputData := traces[startIndex + 10:endIndex]
-					for i := 0; i < len(inputData) / 64; i++ {
-						addr := string(inputData[i * 64 : (i + 1) * 64])
-						if potentialAddress(addr) {
-							addr = "0x" + string(addr[24:])
-							if goodAddr(addr) {
-								addressMap[addr + blockAndIdx] = true
-							}
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 
