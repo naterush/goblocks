@@ -59,6 +59,11 @@ func TraceStateMachine(traces []byte) {
 	transactionPosition += 1
 	addressesIndex += 1
 
+	blockNumStr := "005000000"
+
+	// Address + block + index store
+	addressMap := make(map[string]bool)
+
 	for index := 0; index < len(traces); index++ {
 		token := traces[index]
 
@@ -77,10 +82,10 @@ func TraceStateMachine(traces []byte) {
 			case STATE_START:
 				state = STATE_O
 			case STATE_T:
+				// READ IN "to"
 				fmt.Println("From to:", string(traces[index + 4: index + 4 + 42]))
-				// to
-				// Read in address
-				// move index forward
+				addressesInTrace[addressesIndex] = string(traces[index + 4: index + 4 + 42])
+				addressesIndex += 1
 
 				state = STATE_START
 			case STATE_P_CAP:
@@ -100,11 +105,14 @@ func TraceStateMachine(traces []byte) {
 					}
 				}
 
-				fmt.Println("Transaction Position:", string(traces[transactionPositionStart: transactionPositionEnd]))
-				
+				// Write out addresses to map
+				transactionPositionStr := padLeft(string(traces[transactionPositionStart: transactionPositionEnd]), 5)
+				fmt.Println("Transaction Position:", transactionPositionStr)
 
-				// Read in address
-				// move index forward
+				for j := 0; j < addressesIndex; j++ {
+					addressMap[addressesInTrace[j] + "\t" + blockNumStr + "\t" + transactionPositionStr] = true
+				}
+				addressesIndex = 0
 
 				state = STATE_START
 			default:
@@ -120,7 +128,7 @@ func TraceStateMachine(traces []byte) {
 		case u:
 			switch state {
 			case STATE_A:
-				fmt.Println("Should be author:", string(traces[index - 2: index + 4]))
+				fmt.Println("From author:", string(traces[index + 6: index + 6 + 42]))
 				// author
 				// Read in address
 				// move index forward
@@ -225,4 +233,15 @@ func TraceStateMachine(traces []byte) {
 		}
 
 	}
+}
+
+func leftPad(str string, totalLen int) string {
+	if len(str) >= totalLen {
+		return str
+	}
+	zeros := ""
+	for i := 0; i < totalLen-len(str); i++ {
+		zeros += "0"
+	}
+	return zeros + str
 }

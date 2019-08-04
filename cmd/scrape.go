@@ -315,7 +315,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		}
 		blockNum := ""
 		if traces.Result != nil && len(traces.Result) > 0 {
-			blockNum = padLeft(strconv.Itoa(traces.Result[0].BlockNumber), 9)
+			blockNum = leftPad(strconv.Itoa(traces.Result[0].BlockNumber), 9)
 			extractAddressesFromTraces(rpcProvider, addressMap, &traces, blockNum)
 		}
 		writeAddresses(blockNum, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
@@ -329,7 +329,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			os.Exit(1) // caller will start over if this process exits with non-zero value
 		}
 		if blockNum == "" && len(logs.Result) > 0 {
-			blockNum = padLeft(logs.Result[0].BlockNumber, 9)
+			blockNum = leftPad(logs.Result[0].BlockNumber, 9)
 		}
 		if blockNum != "" {
 			extractAddressesFromLogs(addressMap, &logs, blockNum)
@@ -345,7 +345,7 @@ func extractAddressesFromTraces(rpcProvider string, addressMap map[string]bool, 
 
 	for i := 0; i < len(traces.Result); i++ {
 
-		idx := padLeft(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
+		idx := leftPad(strconv.Itoa(traces.Result[i].TransactionPosition), 5)
 		blockAndIdx := "\t" + blockNum + "\t" + idx
 
 		if traces.Result[i].Type == "call" {
@@ -495,7 +495,7 @@ func extractAddressesFromLogs(addressMap map[string]bool, logs *BlockLogs, block
 			fmt.Println(err)
 			os.Exit(1) // caller will start over if this process exits with non-zero value
 		}
-		idx := padLeft(strconv.FormatInt(idxInt, 10), 5)
+		idx := leftPad(strconv.FormatInt(idxInt, 10), 5)
 
 		blockAndIdx := "\t" + blockNum + "\t" + idx
 
@@ -603,7 +603,7 @@ func ProcessBlocks(rpcProvider string, nBlockProcs int, nAddrProcs int, startBlo
 	addressWG.Wait()
 }
 
-func padLeft(str string, totalLen int) string {
+func leftPad(str string, totalLen int) string {
 	if len(str) >= totalLen {
 		return str
 	}
