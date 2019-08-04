@@ -375,7 +375,7 @@ func extractAddressesFromTracesNoJSON(blockStr string, traces []byte, addressMap
 	transactionIndex := 0 
 	indexString := padLeft(strconv.Itoa(0), 5)
 	blockAndIdx := "\t" + blockStr + "\t" + indexString
-
+g
 	
 	for index := 27; index < len(traces); index++ {
 		if traces[index] == openBracket {
@@ -393,7 +393,7 @@ func extractAddressesFromTracesNoJSON(blockStr string, traces []byte, addressMap
 	
 		for _, keywordPtr := range followedByAddress {
 			if bytes.HasPrefix(traces[index:], *keywordPtr) {
-				address := string(traces[index + 4 + len(*keywordPtr):index + 46 + len(*keywordPtr)])
+				address := string(traces[index + 3 + len(*keywordPtr):index + 45 + len(*keywordPtr)])
 				addressMap[address + blockAndIdx] = true
 			}
 		
