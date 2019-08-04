@@ -77,7 +77,7 @@ func TraceStateMachine(traces []byte) {
 			case STATE_START:
 				state = STATE_O
 			case STATE_T:
-				fmt.Println("Should be to:", string(traces[index + 2: index + 5]))
+				fmt.Println("From to:", string(traces[index + 3: index + 40 + 3]))
 				// to
 				// Read in address
 				// move index forward
