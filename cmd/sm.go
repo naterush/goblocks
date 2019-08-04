@@ -52,8 +52,10 @@ func TraceStateMachine(traces []byte) {
 	const MAX_ADDRESSES_IN_TRACE = 1000
 	transactionPosition := 0
 	var addressesInTrace [MAX_ADDRESSES_IN_TRACE]string
-	addressesInTrace[1] = "hi"
 	addressesIndex := 0
+
+	addressesInTrace[1] = "hi"
+	transactionPosition += 1
 	addressesIndex += 1
 
 	for index := 0; index < len(traces); index++ {
