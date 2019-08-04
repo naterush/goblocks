@@ -105,7 +105,9 @@ func TraceStateMachine(traces []byte) map[string]bool {
 				fmt.Println("Transaction Position:", transactionPositionStr)
 
 				for j := 0; j < addressesIndex; j++ {
-					addressMap[addressesInTrace[j] + "\t" + blockNumStr + "\t" + transactionPositionStr] = true
+					if isGood(addressesInTrace[j]) {
+						addressMap[addressesInTrace[j] + "\t" + blockNumStr + "\t" + transactionPositionStr] = true
+					}
 				}
 				addressesIndex = 0
 
