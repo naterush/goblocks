@@ -128,7 +128,7 @@ func TraceStateMachine(traces []byte) {
 		case u:
 			switch state {
 			case STATE_A:
-				fmt.Println("From author:", string(traces[index + 6: index + 6 + 42]))
+				fmt.Println("From author:", string(traces[index + 7: index + 7 + 42]))
 				// author
 				// Read in address
 				// move index forward
