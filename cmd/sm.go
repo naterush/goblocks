@@ -130,7 +130,7 @@ func TraceStateMachine(traces []byte) map[string]bool {
 				// move index forward
 				state = STATE_START
 			case STATE_O:
-				fmt.Println("Should be output:", string(traces[index + 8: index + 8 + 42]))
+				fmt.Println("Should be output:", string(traces[index + 8: index + 10]))
 				// output
 				// Read in address
 				// move index forward
@@ -188,7 +188,7 @@ func TraceStateMachine(traces []byte) map[string]bool {
 			case STATE_START:
 				state = STATE_I
 			case STATE_N:
-				fmt.Println("Should be init:", string(traces[index - 3: index + 11]))
+				fmt.Println("Should be init:", string(traces[index + 5: index + 7]))
 				// init
 				// Read in address
 				// move index forward
@@ -206,7 +206,7 @@ func TraceStateMachine(traces []byte) map[string]bool {
 		case p:
 			switch state {
 			case STATE_N:
-				fmt.Println("Should be input:", string(traces[index - 3: index + 2]))
+				fmt.Println("Should be input:", string(traces[index + 6: index + 8]))
 				// input
 				// Read in address
 				// move index forward
