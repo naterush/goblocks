@@ -91,7 +91,7 @@ func TraceStateMachine(traces []byte) {
 			switch state {
 			case STATE_O_AFTER_P_CAP:
 				// 
-				fmt.Println("Transaction Position:", string(traces[index: index + 10]))
+				fmt.Println("Transaction Position:", string(traces[index + 7: index + 10]))
 				
 
 				// Read in address
