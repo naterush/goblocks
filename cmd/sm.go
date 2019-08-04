@@ -43,6 +43,7 @@ func TraceStateMachine(traces []byte) {
 	p := []byte("p")[0]
 	s := []byte("s")[0]
 	P := []byte("P")[0]
+	comma := []byte(",")[0]
 	//openBracket := byte(123) // byte value of {
 	//closeBracket := byte(125) // byte value of }
 	//openBracketStraight := byte(91) // byte value of [
@@ -51,7 +52,7 @@ func TraceStateMachine(traces []byte) {
 	// Keep track of these indexes
 	const MAX_ADDRESSES_IN_TRACE = 1000
 	transactionPosition := 0
-	var addressesInTrace [MAX_ADDRESSES_IN_TRACE]string
+	var addressesInTrace [5000]string
 	addressesIndex := 0
 
 	addressesInTrace[1] = "hi"
@@ -90,8 +91,16 @@ func TraceStateMachine(traces []byte) {
 		case s:
 			switch state {
 			case STATE_O_AFTER_P_CAP:
-				// 
-				fmt.Println("Transaction Position:", string(traces[index + 8: index + 10]))
+				transactionPositionStart :=  index + 8
+				transactionPositionEnd := index + 8
+				for j := transactionPositionStart; j < len(traces); j++ {
+					if traces[j] == comma {
+						transactionPositionEnd = j
+						break
+					}
+				}
+
+				fmt.Println("Transaction Position:", string(traces[transactionPositionStart: transactionPositionEnd]))
 				
 
 				// Read in address
