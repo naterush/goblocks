@@ -234,8 +234,8 @@ func TraceStateMachine(traces []byte) map[int]string {
 		default:
 			state = STATE_START
 		}
-
 	}
+	return addressMap
 }
 
 func padLeft(str string, totalLen int) string {
