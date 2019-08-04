@@ -235,7 +235,7 @@ func TraceStateMachine(traces []byte) {
 	}
 }
 
-func leftPad(str string, totalLen int) string {
+func padLeft(str string, totalLen int) string {
 	if len(str) >= totalLen {
 		return str
 	}
