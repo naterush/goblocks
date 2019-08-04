@@ -197,7 +197,7 @@ func TraceStateMachine(traces []byte) {
 			}
 		case P:
 			switch state {
-			case START_STATE:
+			case STATE_START:
 				state = STATE_P_CAP
 			default:
 				state = STATE_START
