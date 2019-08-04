@@ -182,7 +182,7 @@ func TraceStateMachine(traces []byte) {
 			case STATE_START:
 				state = STATE_F
 			case STATE_E:
-				fmt.Println("Should be refundAddress:", string(traces[index - 3: index + 10]))
+				fmt.Println("Should be refundAddress:", string(traces[index + 15: index + 15 + 42]))
 				// refundAddress
 				// Read in address
 				// move index forward
