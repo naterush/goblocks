@@ -414,13 +414,15 @@ func extractAddressesFromTracesNoJSON(blockStr string, traces []byte, addressMap
 						break
 					}
 				}
-				inputData := traces[startIndex + 10:endIndex]
-				for i := 0; i < len(inputData) / 64; i++ {
-					addr := string(inputData[i * 64 : (i + 1) * 64])
-					if potentialAddress(addr) {
-						addr = "0x" + string(addr[24:])
-						if goodAddr(addr) {
-							addressMap[addr + blockAndIdx] = true
+				if (startIndex + 10 < endIndex) {
+					inputData := traces[startIndex + 10:endIndex]
+					for i := 0; i < len(inputData) / 64; i++ {
+						addr := string(inputData[i * 64 : (i + 1) * 64])
+						if potentialAddress(addr) {
+							addr = "0x" + string(addr[24:])
+							if goodAddr(addr) {
+								addressMap[addr + blockAndIdx] = true
+							}
 						}
 					}
 				}
