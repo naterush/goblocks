@@ -101,7 +101,7 @@ func TraceStateMachine(traces []byte) map[string]bool {
 				}
 
 				// Write out addresses to map
-				transactionPositionStr := padLeft(string(traces[transactionPositionStart: transactionPositionEnd]), 5)
+				transactionPositionStr := leftPad(string(traces[transactionPositionStart: transactionPositionEnd]), 5)
 				fmt.Println("Transaction Position:", transactionPositionStr)
 
 				for j := 0; j < addressesIndex; j++ {
@@ -286,15 +286,4 @@ func TraceStateMachine(traces []byte) map[string]bool {
 		}
 	}
 	return addressMap
-}
-
-func padLeft(str string, totalLen int) string {
-	if len(str) >= totalLen {
-		return str
-	}
-	zeros := ""
-	for i := 0; i < totalLen-len(str); i++ {
-		zeros += "0"
-	}
-	return zeros + str
 }
