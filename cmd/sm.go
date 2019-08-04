@@ -21,7 +21,9 @@ func TraceStateMachine(traces []byte) {
 		STATE_N
 		STATE_I_AFTER_N
 		STATE_P
+		STATE_P_CAP
 		STATE_O
+		STATE_O_AFTER_P_CAP
 		STATE_U_AFTER_O
 		STATE_T_AFTER_OU
 	)
@@ -39,10 +41,15 @@ func TraceStateMachine(traces []byte) {
 	i := []byte("i")[0]
 	n := []byte("n")[0]
 	p := []byte("p")[0]
+	s := []byte("s")[0]
+	P := []byte("P")[0]
 	//openBracket := byte(123) // byte value of {
 	//closeBracket := byte(125) // byte value of }
 	//openBracketStraight := byte(91) // byte value of [
 	//closeBracketStraight := byte(93) // byte value of ] TODO: this might be wrong!, but i don't really need it
+
+	// The transaction index is at the end, always, after all the addresses have been found
+	transactionPosition := 0
 
 	for index := 0; index < len(traces); index++ {
 		token := traces[index]
@@ -64,6 +71,20 @@ func TraceStateMachine(traces []byte) {
 			case STATE_T:
 				fmt.Println("Should be to:", string(traces[index - 1: index + 1]))
 				// to
+				// Read in address
+				// move index forward
+
+				state = STATE_START
+			case STATE_P_CAP:
+				state = STATE_O_AFTER_P_CAP
+			default:
+				state = STATE_START
+			}
+		case s:
+			switch state {
+			case STATE_O_AFTER_P_CAP:
+				// 
+				fmt.Println("Transaction Position:", string(traces[index - 10: index + 10]))
 				// Read in address
 				// move index forward
 
@@ -171,6 +192,13 @@ func TraceStateMachine(traces []byte) {
 				// Read in address
 				// move index forward
 				state = STATE_START
+			default:
+				state = STATE_START
+			}
+		case P:
+			switch state {
+			case START_STATE:
+				state = STATE_P_CAP
 			default:
 				state = STATE_START
 			}
