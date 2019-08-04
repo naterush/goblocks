@@ -355,6 +355,7 @@ func extractAddressesNoJSON(blockTraceAndLog BlockInternals) map[string]bool {
 }
 
 func extractAddressesFromTracesNoJSON(blockStr string, traces []byte, addressMap map[string]bool) {
+	fmt.Println(string(traces))
 	to := []byte("to")
 	from := []byte("from")
 	author := []byte("author")
