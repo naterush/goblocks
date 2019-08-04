@@ -5,7 +5,7 @@ import (
 )
 
 
-func TraceStateMachine(traces []byte) {
+func TraceStateMachine(traces []byte) map[int]string {
 	// Declare all the states we need
 	const (
 		STATE_START = iota
@@ -129,6 +129,8 @@ func TraceStateMachine(traces []byte) {
 			switch state {
 			case STATE_A:
 				fmt.Println("From author:", string(traces[index + 8: index + 8 + 42]))
+				addressesInTrace[addressesIndex] = string(traces[index + 8: index + 8 + 42])
+				addressesIndex += 1
 				// author
 				// Read in address
 				// move index forward
@@ -157,12 +159,16 @@ func TraceStateMachine(traces []byte) {
 				state = STATE_R
 			case STATE_D_AFTER_D:
 				fmt.Println("Should be address:", string(traces[index + 9: index + 9 + 42]))
+				addressesInTrace[addressesIndex] = string(traces[index + 9: index + 9 + 42])
+				addressesIndex += 1
 				// address
 				// Read in address
 				// move index forward
 				state = STATE_START
 			case STATE_F:
 				fmt.Println("Should be from:", string(traces[index + 6: index + 6 + 42]))
+				addressesInTrace[addressesIndex] = string(traces[index + 6: index + 6 + 42])
+				addressesIndex += 1
 				// from
 				// Read in address
 				// move index forward
@@ -183,6 +189,8 @@ func TraceStateMachine(traces []byte) {
 				state = STATE_F
 			case STATE_E:
 				fmt.Println("Should be refundAddress:", string(traces[index + 15: index + 15 + 42]))
+				addressesInTrace[addressesIndex] = string(traces[index + 15: index + 15 + 42])
+				addressesIndex += 1
 				// refundAddress
 				// Read in address
 				// move index forward
