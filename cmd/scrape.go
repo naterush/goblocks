@@ -344,13 +344,13 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 
 func extractAddressesNoJSON(blockTraceAndLog BlockInternals) map[string]bool {
 	addressMap := make(map[string]bool)
-	blockStr = padLeft(strconv.Itoa(BlockInternals.BlockNum), 9)
+	blockStr := padLeft(strconv.Itoa(blockTraceAndLog.BlockNum), 9)
 
 	// then we extract the addresses from the traces
-	extractAddressesFromTracesNoJSON(blockStr, BlockInternals.Traces, addressMap)
+	extractAddressesFromTracesNoJSON(blockStr, blockTraceAndLog.Traces, addressMap)
 
 	// then we extract the addresses from the logs
-	//extractAddressesFromLogsNoJSON(blockStr, BlockInternals.Traces, addressMap)
+	//extractAddressesFromLogsNoJSON(blockStr, blockTraceAndLog.Traces, addressMap)
 	return addressMap
 }
 
@@ -373,17 +373,17 @@ func extractAddressesFromTracesNoJSON(blockStr string, traces []bytes, addressMa
 	nesting := 0 // whenever nesting returns to 0, we update transaction position by one
 	transactionIndex := 0 
 	indexString := padLeft(strconv.Itoa(0), 5)
-	blockAndIdx := "\t" + blockNum + "\t" + idx
+	blockAndIdx := "\t" + blockStr + "\t" + indexString
 
 	
-	for index := 51; index < len(temp); index++ {
-		if temp[index] == openBracket {
+	for index := 51; index < len(traces); index++ {
+		if traces[index] == openBracket {
 			nesting += 1
 		}
-		if temp[index] == closeBracket {
+		if traces[index] == closeBracket {
 			nesting -= 1
 		}
-		if nesting == 0 && temp[index - 1] == closeBracket {
+		if nesting == 0 && traces[index - 1] == closeBracket {
 			transactionIndex += 1
 			indexString = padLeft(strconv.Itoa(transactionIndex), 5)
 			blockAndIdx = "\t" + blockStr + "\t" + indexString
@@ -391,19 +391,19 @@ func extractAddressesFromTracesNoJSON(blockStr string, traces []bytes, addressMa
 		
 	
 		for _, keywordPtr := range followedByAddress {
-			if bytes.HasPrefix(temp[index:], *keywordPtr) {
-				address := string(temp[index + 8:index + 50])
+			if bytes.HasPrefix(traces[index:], *keywordPtr) {
+				address := string(traces[index + 8:index + 50])
 				addressMap[address + blockAndIdx]
 			}
 		
 		}
 		for _, keywordPtr := range followedByData {
-			if bytes.HasPrefix(temp[index:], *keywordPtr) {
+			if bytes.HasPrefix(traces[index:], *keywordPtr) {
 				startIndex := 0
 				endIndex := 0
 				numQuotes := 0
-				for j := index; j < len(temp); j++ {
-					if temp[j] == quote {
+				for j := index; j < len(traces); j++ {
+					if traces[j] == quote {
 						numQuotes += 1
 					}
 					if numQuotes == 2 {
@@ -414,7 +414,7 @@ func extractAddressesFromTracesNoJSON(blockStr string, traces []bytes, addressMa
 						break
 					}
 				}
-				inputData := temp[startIndex + 10:endIndex]
+				inputData := traces[startIndex + 10:endIndex]
 				for i := 0; i < len(inputData) / 64; i++ {
 					addr := string(inputData[i * 64 : (i + 1) * 64])
 					if potentialAddress(addr) {
