@@ -51,13 +51,8 @@ func TraceStateMachine(traces []byte) map[int]string {
 
 	// Keep track of these indexes
 	const MAX_ADDRESSES_IN_TRACE = 1000
-	transactionPosition := 0
 	var addressesInTrace [5000]string
 	addressesIndex := 0
-
-	addressesInTrace[1] = "hi"
-	transactionPosition += 1
-	addressesIndex += 1
 
 	blockNumStr := "005000000"
 
