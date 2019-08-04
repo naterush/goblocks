@@ -48,8 +48,11 @@ func TraceStateMachine(traces []byte) {
 	//openBracketStraight := byte(91) // byte value of [
 	//closeBracketStraight := byte(93) // byte value of ] TODO: this might be wrong!, but i don't really need it
 
-	// The transaction index is at the end, always, after all the addresses have been found
-	//transactionPosition := 0
+	// Keep track of these indexes
+	MAX_ADDRESSES_IN_TRACE := 1000
+	transactionPosition := 0
+	var addressesInTrace [MAX_ADDRESSES_IN_TRACE]string
+	addressesIndex := 0
 
 	for index := 0; index < len(traces); index++ {
 		token := traces[index]
@@ -84,7 +87,9 @@ func TraceStateMachine(traces []byte) {
 			switch state {
 			case STATE_O_AFTER_P_CAP:
 				// 
-				fmt.Println("Transaction Position:", string(traces[index - 10: index + 10]))
+				fmt.Println("Transaction Position:", string(traces[index: index + 10]))
+				
+
 				// Read in address
 				// move index forward
 
