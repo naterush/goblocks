@@ -49,7 +49,7 @@ func TraceStateMachine(traces []byte) {
 	//closeBracketStraight := byte(93) // byte value of ] TODO: this might be wrong!, but i don't really need it
 
 	// The transaction index is at the end, always, after all the addresses have been found
-	transactionPosition := 0
+	//transactionPosition := 0
 
 	for index := 0; index < len(traces); index++ {
 		token := traces[index]
