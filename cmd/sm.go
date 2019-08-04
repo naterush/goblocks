@@ -188,4 +188,5 @@ func TraceStateMachine(traces []byte) {
 			}
 		}
 	}
+	fmt.Println(string(traces))
 }
