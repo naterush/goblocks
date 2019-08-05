@@ -255,6 +255,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			rangeChannelTraces <- Range{startIdx, endIdx}
 			startIdx = endIdx
 		}
+		close(rangeChannelTraces)
 
 		var logWG sync.WaitGroup
 		logWG.Add(20)
@@ -282,6 +283,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			rangeChannelLogs <- Range{startIdx, endIdx}
 			startIdx = endIdx
 		}
+		close(rangeChannelLogs)
 		fmt.Println("\n\nWAITING FOR TRACES AND LOGS")
 		// Wait for the various state machines to finish
 		traceWG.Wait()
