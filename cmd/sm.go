@@ -307,7 +307,6 @@ func LogStateMachine(logs []byte, addressMap map[string]bool, blockNumStr string
 	n := []byte("n")[0]
 	I := []byte("I")[0]
 	comma := []byte(",")[0]
-	quote := byte(34)
 	//openBracket := byte(123) // byte value of {
 	//closeBracket := byte(125) // byte value of }
 	//openBracketStraight := byte(91) // byte value of [
