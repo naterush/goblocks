@@ -368,7 +368,7 @@ func LogStateMachine(logs []byte) map[string]bool {
 
 				// jump by 69
 				for j := startIndex; j <= endIndex ; j+= 69 {
-					addr := string(logs[j + 1 + 2: j + 1 + 66]))
+					addr := string(logs[j + 1 + 2: j + 1 + 66])
 					if potentialAddress(addr) {
 						addr = "0x" + string(addr[24:])
 						if goodAddr(addr) {
@@ -406,7 +406,7 @@ func LogStateMachine(logs []byte) map[string]bool {
 				fmt.Println("DATA:", string(logs[startIndex: endIndex]))
 
 				if startIndex + 2 <= endIndex {
-					data := logs[startIndex + 2; endIndex]
+					data := logs[startIndex + 2: endIndex]
 					for i := 0; i < len(data) / 64; i++ {
 						addr := string(data[i*64 : (i + 1) * 64])
 						if potentialAddress(addr) {
