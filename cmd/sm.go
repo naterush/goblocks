@@ -426,6 +426,7 @@ func LogStateMachine(logs []byte) map[string]bool {
 		case P:
 			switch state {
 			case STATE_START:
+				fmt.Println("P")
 				state = STATE_P_CAP
 			default:
 				state = STATE_START
