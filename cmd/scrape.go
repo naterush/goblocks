@@ -200,12 +200,22 @@ func getTracesAndLogs(rpcProvider string, blockChannel chan int, addressChannel 
 	blockWG.Done()
 }
 
+
+func recieveAddresses(addressChannel chan string, blockNumStr string, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
+	addressMap := make(map[string]bool)
+	for addressSighting := range addressChannel {
+		addressMap[addressSighting] = true
+	}
+	writeAddresses("SM" + blockNumberStr, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
+}
+
 func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, addressWG *sync.WaitGroup, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
 
 	for blockTraceAndLog := range addressChannel {
-		
-		addressMap := make(map[string]bool)
 		blockNumberStr := leftPad(strconv.Itoa(blockTraceAndLog.BlockNumber), 9)
+		addressChannel := make(chan string)
+
+		go recieveAddresses(addressChannel, blockNumberStr, nBlocks, ripeBlock, unripePath, ripePath)
 
 		var traceWG sync.WaitGroup
 		traceWG.Add(20)
@@ -220,7 +230,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 				endIdx = len(blockTraceAndLog.Traces)
 			}
 
-			go TraceStateMachine(blockTraceAndLog.Traces[startIdx:endIdx], addressMap, blockNumberStr, &traceWG)
+			go TraceStateMachine(blockTraceAndLog.Traces[startIdx:endIdx], addressChannel, blockNumberStr, &traceWG)
 		}
 
 		var logWG sync.WaitGroup
@@ -235,13 +245,12 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			} else {
 				endIdx = len(blockTraceAndLog.Logs)
 			}
-			go LogStateMachine(blockTraceAndLog.Logs[startIdx:endIdx], addressMap, blockNumberStr, &logWG)
+			go LogStateMachine(blockTraceAndLog.Logs[startIdx:endIdx], addressChannel, blockNumberStr, &logWG)
 		}
 
 		traceWG.Wait()
 		logWG.Wait()
-
-		writeAddresses("SM" + blockNumberStr, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
+		close(addressChannel)
 	}
 	addressWG.Done()
 }

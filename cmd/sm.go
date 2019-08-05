@@ -6,7 +6,7 @@ import (
 )
 
 
-func TraceStateMachine(traces []byte, addressMap map[string]bool, blockNumStr string, traceWG *sync.WaitGroup){
+func TraceStateMachine(traces []byte, addressChannel chan string, blockNumStr string, traceWG *sync.WaitGroup){
 	// States for the state machine
 	const (
 		STATE_START = iota
@@ -220,7 +220,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool, blockNumStr st
 				// Write out addresses to map
 				for j := 0; j < addressesIndex; j++ {
 					if goodAddr(addressesInTrace[j]) {
-						addressMap[addressesInTrace[j] + blockAndIndex] = true
+						addressChannel <- addressesInTrace[j] + blockAndIndex
 					}
 				}
 				addressesIndex = 0
@@ -242,7 +242,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool, blockNumStr st
 			switch state {
 			case STATE_A:
 				// Author
-				addressMap[string(traces[index + 8: index + 8 + 42]) + "\t" + blockNumStr + "\t" + "99999"] = true
+				addressChannel <- string(traces[index + 8: index + 8 + 42]) + "\t" + blockNumStr + "\t" + "99999"
 				state = STATE_START
 			case STATE_O:
 				// Output
@@ -289,7 +289,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool, blockNumStr st
 
 
 
-func LogStateMachine(logs []byte, addressMap map[string]bool, blockNumStr string, logWG *sync.WaitGroup) {
+func LogStateMachine(logs []byte, addressChannel chan string, blockNumStr string, logWG *sync.WaitGroup) {
 	// States for the state machine
 	const (
 		STATE_START = iota
@@ -441,7 +441,7 @@ func LogStateMachine(logs []byte, addressMap map[string]bool, blockNumStr string
 
 				for j := 0; j < addressesIndex; j++ {
 					if goodAddr(addressesInTrace[j]) {
-						addressMap[addressesInTrace[j] + "\t" + blockNumStr + "\t" + transactionPositionStr] = true
+						addressChannel <- addressesInTrace[j] + "\t" + blockNumStr + "\t" + transactionPositionStr
 					}
 				}
 				addressesIndex = 0
