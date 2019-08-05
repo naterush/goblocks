@@ -312,7 +312,7 @@ func LogStateMachine(logs []byte) map[string]bool {
 	//openBracket := byte(123) // byte value of {
 	//closeBracket := byte(125) // byte value of }
 	//openBracketStraight := byte(91) // byte value of [
-	//closeBracketStraight := byte(93) // byte value of ] TODO: this might be wrong!, but i don't really need it
+	closeBracketStraight := byte(93) // byte value of ] TODO: this might be wrong!, but i don't really need it
 
 	// Keep track of these indexes
 	//const MAX_ADDRESSES_IN_TRACE = 1000
@@ -348,7 +348,16 @@ func LogStateMachine(logs []byte) map[string]bool {
 			switch state {
 			case STATE_O:
 				// Read in the topics
-				fmt.Println("TOPICS:", string(logs[index + 8: index + 10]))
+				startIndex := index + 8
+				endIndex := index + 4
+				for j := startIndex; j < len(logs); j++ {
+					if logs[j] == closeBracketStraight {
+						endIndex = j
+						break
+					}
+				}
+
+				fmt.Println("TOPICS:", string(logs[startIndex: endIndex]))
 				
 
 				state = STATE_START
