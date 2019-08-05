@@ -348,7 +348,7 @@ func LogStateMachine(logs []byte) map[string]bool {
 			switch state {
 			case STATE_O:
 				// Read in the topics
-				startIndex := index + 8
+				startIndex := index + 7
 				endIndex := index + 4
 				for j := startIndex; j < len(logs); j++ {
 					if logs[j] == closeBracketStraight {
