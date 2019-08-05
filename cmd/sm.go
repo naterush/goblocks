@@ -343,7 +343,7 @@ func LogStateMachine(logs []byte, addressMap map[string]bool) {
 	}
 
 	blockNum, _ := strconv.ParseInt(string(logs[blockNumStartIndex: blockNumEndIndex]), 0, 64)				
-	blockNumStr :=  leftPad(strconv.FormatInt(blockNum, 10), 5)
+	blockNumStr :=  leftPad(strconv.FormatInt(blockNum, 10), 9)
 	fmt.Println("BLOCKNUMBER2:", blockNumStr)
 
 
