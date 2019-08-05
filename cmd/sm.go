@@ -325,7 +325,7 @@ func LogStateMachine(logs []byte) map[string]bool {
 	var addressesInTrace [5000]string
 	addressesIndex := 0
 
-	//blockNumStr := "005000000"
+	blockNumStr := "005000000"
 
 	// Address + block + index store
 	addressMap := make(map[string]bool)
