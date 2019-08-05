@@ -338,7 +338,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 }
 
 func extractAddressesNoJSON(blockTraceAndLog BlockInternals) {
-	fmt.Println("TRACE:", string(blockTraceAndLog.Trace))
+	fmt.Println("TRACE:", string(blockTraceAndLog.Traces))
 	fmt.Println("LOGS:", string(blockTraceAndLog.Logs))
 }
 
