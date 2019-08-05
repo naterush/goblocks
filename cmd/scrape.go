@@ -313,12 +313,12 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1) // caller will start over if this process exits with non-zero value
-		}
+		} */
 		blockNum := ""
 		if traces.Result != nil && len(traces.Result) > 0 {
 			blockNum = leftPad(strconv.Itoa(traces.Result[0].BlockNumber), 9)
-			extractAddressesFromTraces(rpcProvider, addressMap, &traces, blockNum)
-		} */
+			//extractAddressesFromTraces(rpcProvider, addressMap, &traces, blockNum)
+		} 
 		newAddressMap := TraceStateMachine(blockTraceAndLog.Traces)
 		writeAddresses("SM" + blockNum, newAddressMap, nBlocks, ripeBlock, unripePath, ripePath)
 
@@ -327,7 +327,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		
 		// Now, parse log data
 		var logs BlockLogs
-		err = json.Unmarshal(blockTraceAndLog.Logs, &logs)
+		err := json.Unmarshal(blockTraceAndLog.Logs, &logs)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1) // caller will start over if this process exits with non-zero value
