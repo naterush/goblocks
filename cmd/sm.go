@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"strconv"
+	"bytes"
 )
 
 
@@ -55,6 +56,8 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 	var addressesInTrace [5000]string
 	addressesIndex := 0
 
+	temp := bytes.Index(traces, []byte("blockNumber"))
+	fmt.Println("BLOCKNUMBER:", traces[temp: temp + 10])
 	blockNumStr := "005000000"
 
 	for index := 0; index < len(traces); index++ {
