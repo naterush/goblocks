@@ -308,7 +308,7 @@ func LogStateMachine(logs []byte) map[string]bool {
 	p := []byte("p")[0]
 	d := []byte("d")[0]
 	a := []byte("a")[0]
-	//comma := []byte(",")[0]
+	comma := []byte(",")[0]
 	//openBracket := byte(123) // byte value of {
 	//closeBracket := byte(125) // byte value of }
 	//openBracketStraight := byte(91) // byte value of [
@@ -371,14 +371,14 @@ func LogStateMachine(logs []byte) map[string]bool {
 				startIndex := index + 4
 				endIndex := index + 4
 				for j := startIndex; j < len(logs); j++ {
-					if traces[j] == comma {
+					if logs[j] == comma {
 						endIndex = j
 						break
 					}
 				}
 
 
-				fmt.Println("DATA:", string(logs[stateIndex: endIndex]))
+				fmt.Println("DATA:", string(logs[startIndex: endIndex]))
 
 				state = STATE_START
 			default:
