@@ -299,6 +299,10 @@ func LogStateMachine(logs []byte) map[string]bool {
 		STATE_D
 		STATE_A
 		STATE_T_AFTER_A
+		STATE_P_CAP
+		STATE_O_AFTER_P_CAP
+		STATE_S
+
 	)
 
 	state := STATE_START
@@ -308,6 +312,8 @@ func LogStateMachine(logs []byte) map[string]bool {
 	p := []byte("p")[0]
 	d := []byte("d")[0]
 	a := []byte("a")[0]
+	P := []byte("P")[0]
+	s := []byte("s")[0]
 	comma := []byte(",")[0]
 	//openBracket := byte(123) // byte value of {
 	//closeBracket := byte(125) // byte value of }
@@ -315,9 +321,9 @@ func LogStateMachine(logs []byte) map[string]bool {
 	closeBracketStraight := byte(93) // byte value of ] TODO: this might be wrong!, but i don't really need it
 
 	// Keep track of these indexes
-	//const MAX_ADDRESSES_IN_TRACE = 1000
-	//var addressesInTrace [5000]string
-	//addressesIndex := 0
+	const MAX_ADDRESSES_IN_TRACE = 1000
+	var addressesInTrace [5000]string
+	addressesIndex := 0
 
 	//blockNumStr := "005000000"
 
@@ -341,6 +347,8 @@ func LogStateMachine(logs []byte) map[string]bool {
 			switch state {
 			case STATE_T:
 				state = STATE_O
+			case STATE_P_CAP:
+				state = STATE_O_AFTER_P_CAP
 			default:
 				state = STATE_START
 			}
@@ -360,11 +368,15 @@ func LogStateMachine(logs []byte) map[string]bool {
 
 				// jump by 69
 				for j := startIndex; j <= endIndex ; j+= 69 {
-					fmt.Println("T:", string(logs[j + 1: j + 1 + 66]))
+					addr := string(logs[j + 1 + 2: j + 1 + 66]))
+					if potentialAddress(addr) {
+						addr = "0x" + string(addr[24:])
+						if goodAddr(addr) {
+							addressesInTrace[addressesIndex] = addr
+							addressesIndex += 1
+						}
+					}
 				}
-
-
-				
 
 				state = STATE_START
 			default:
@@ -391,9 +403,55 @@ func LogStateMachine(logs []byte) map[string]bool {
 						break
 					}
 				}
-
-
 				fmt.Println("DATA:", string(logs[startIndex: endIndex]))
+
+				if startIndex + 2 <= endIndex {
+					data := logs[startIndex + 2; endIndex]
+					for i := 0; i < len(data) / 64; i++ {
+						addr := string(data[i*64 : (i + 1) * 64])
+						if potentialAddress(addr) {
+							addr = "0x" + string(addr[24:])
+							if goodAddr(addr) {
+								addressesInTrace[addressesIndex] = addr
+								addressesIndex += 1
+							}
+						}
+					}
+				}
+
+				state = STATE_START
+			default:
+				state = STATE_START
+			}
+		case P:
+			switch state {
+			case STATE_START:
+				state = STATE_P_CAP
+			default:
+				state = STATE_START
+			}
+		case s:
+			switch state {
+			case STATE_O_AFTER_P_CAP:
+				transactionPositionStart :=  index + 8
+				transactionPositionEnd := index + 8
+				for j := transactionPositionStart; j < len(traces); j++ {
+					if traces[j] == comma {
+						transactionPositionEnd = j
+						break
+					}
+				}
+
+				// Write out addresses to map
+				transactionPositionStr := leftPad(string(traces[transactionPositionStart: transactionPositionEnd]), 5)
+				fmt.Println("Transaction Position:", transactionPositionStr)
+
+				for j := 0; j < addressesIndex; j++ {
+					if goodAddr(addressesInTrace[j]) {
+						addressMap[addressesInTrace[j] + "\t" + blockNumStr + "\t" + transactionPositionStr] = true
+					}
+				}
+				addressesIndex = 0
 
 				state = STATE_START
 			default:
