@@ -299,10 +299,8 @@ func LogStateMachine(logs []byte) map[string]bool {
 		STATE_D
 		STATE_A
 		STATE_T_AFTER_A
-		STATE_P_CAP
-		STATE_O_AFTER_P_CAP
-		STATE_S
-
+		STATE_N
+		STATE_I
 	)
 
 	state := STATE_START
@@ -312,8 +310,8 @@ func LogStateMachine(logs []byte) map[string]bool {
 	p := []byte("p")[0]
 	d := []byte("d")[0]
 	a := []byte("a")[0]
-	P := []byte("P")[0]
-	s := []byte("s")[0]
+	n := []byte("n")[0]
+	I := []byte("I")[0]
 	comma := []byte(",")[0]
 	//openBracket := byte(123) // byte value of {
 	//closeBracket := byte(125) // byte value of }
@@ -347,8 +345,6 @@ func LogStateMachine(logs []byte) map[string]bool {
 			switch state {
 			case STATE_T:
 				state = STATE_O
-			case STATE_P_CAP:
-				state = STATE_O_AFTER_P_CAP
 			default:
 				state = STATE_START
 			}
@@ -423,17 +419,16 @@ func LogStateMachine(logs []byte) map[string]bool {
 			default:
 				state = STATE_START
 			}
-		case P:
+		case n:
 			switch state {
 			case STATE_START:
-				fmt.Println("P")
-				state = STATE_P_CAP
+				state = STATE_N
 			default:
 				state = STATE_START
 			}
-		case s:
+		case I:
 			switch state {
-			case STATE_O_AFTER_P_CAP:
+			case STATE_N:
 				transactionPositionStart :=  index + 8
 				transactionPositionEnd := index + 8
 				for j := transactionPositionStart; j < len(logs); j++ {
