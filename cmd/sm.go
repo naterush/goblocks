@@ -58,8 +58,8 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 
 	// Get the block number
 	blockNumStartIndex := bytes.Index(traces, []byte("blockNumber")) + 13
-	blockNumEndIndex := 0
-	for j := blockNumEndIndex; j < len(traces); j++ {
+	blockNumEndIndex := blockNumStartIndex
+	for j := blockNumStartIndex; j < len(traces); j++ {
 		if traces[j] == comma {
 			blockNumEndIndex = j
 			break
