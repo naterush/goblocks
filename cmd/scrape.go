@@ -258,7 +258,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 				}
 			}
 			
-			fmt.Println(string(blockTraceAndLog.Traces[startIdx:endIdx]))
+			fmt.Println("T", string(blockTraceAndLog.Traces[startIdx:endIdx]))
 			rangeChannelTraces <- Range{startIdx, endIdx}
 			startIdx = endIdx
 		}
@@ -290,7 +290,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 					}
 				}
 			}
-			
+			fmt.Println("L", string(blockTraceAndLog.Logs[startIdx:endIdx]))
 			rangeChannelLogs <- Range{startIdx, endIdx}
 			startIdx = endIdx
 		}
