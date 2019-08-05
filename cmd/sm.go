@@ -51,10 +51,10 @@ func TraceStateMachine(traces []byte) map[string]bool {
 
 	// Keep track of these indexes
 	const MAX_ADDRESSES_IN_TRACE = 1000
-	var addressesInTrace [5000]string
-	addressesIndex := 0
+	//var addressesInTrace [5000]string
+	//addressesIndex := 0
 
-	blockNumStr := "005000000"
+	//blockNumStr := "005000000"
 
 	// Address + block + index store
 	addressMap := make(map[string]bool)
@@ -364,7 +364,7 @@ func LogStateMachine(traces []byte) map[string]bool {
 		case a:
 			switch state {
 			case STATE_D:
-				state := STATE_A
+				state = STATE_A
 			case STATE_T_AFTER_A:
 				// Read in the input data!
 				state = STATE_START
