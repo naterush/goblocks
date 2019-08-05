@@ -356,8 +356,14 @@ func LogStateMachine(logs []byte) map[string]bool {
 						break
 					}
 				}
-
 				fmt.Println("TOPICS:", string(logs[startIndex: endIndex]))
+
+				// jump by 69
+				for j := startIndex; j < endIndex ; j+= 69 {
+					fmt.Println("T:", string(logs[j + 1: j + 1 + 68]))
+				}
+
+
 				
 
 				state = STATE_START
