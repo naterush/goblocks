@@ -31,22 +31,22 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool, blockNumStr st
 	// Byte constants
 	const (
 		// special chars
-		comma := byte(44)
+		comma = byte(44)
 		// capitol 
-		P := byte(80)
+		P = byte(80)
 		// lowercase
-		a := byte(97)
-		d := byte(100)
-		e := byte(101)
-		f := byte(102)
-		i := byte(105)
-		n := byte(110)
-		o := byte(111)
-		p := byte(112)
-		r := byte(114)
-		s := byte(115)
-		t := byte(116)
-		u := byte(117)
+		a = byte(97)
+		d = byte(100)
+		e = byte(101)
+		f = byte(102)
+		i = byte(105)
+		n = byte(110)
+		o = byte(111)
+		p = byte(112)
+		r = byte(114)
+		s = byte(115)
+		t = byte(116)
+		u = byte(117)
 	)
 
 	state := STATE_START
@@ -304,17 +304,17 @@ func LogStateMachine(logs []byte, addressMap map[string]bool, blockNumStr string
 	// Byte constants
 	const (
 		// special chars
-		comma := byte(44)
-		closeBracketStraight := byte(93) // ]
+		comma = byte(44)
+		closeBracketStraight = byte(93) // ]
 		// capitol 
-		I := byte(73)
+		I = byte(73)
 		// lowercase
-		a := byte(97)
-		d := byte(100)
-		n := byte(110)
-		o := byte(111)
-		p := byte(112)
-		t := byte(116)
+		a = byte(97)
+		d = byte(100)
+		n = byte(110)
+		o = byte(111)
+		p = byte(112)
+		t = byte(116)
 	)
 
 	state := STATE_START
