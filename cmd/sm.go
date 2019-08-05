@@ -343,10 +343,7 @@ func LogStateMachine(logs []byte, addressMap map[string]bool) {
 	}
 
 	blockNum, _ := strconv.ParseInt(string(logs[blockNumStartIndex: blockNumEndIndex]), 0, 64)			
-	fmt.Println(string(logs[blockNumStartIndex: blockNumEndIndex]))	
 	blockNumStr :=  leftPad(strconv.FormatInt(blockNum, 10), 9)
-	fmt.Println("BLOCKNUMBER2:", blockNumStr)
-
 
 	for index := 0; index < len(logs); index++ {
 		token := logs[index]
