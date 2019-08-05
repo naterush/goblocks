@@ -245,17 +245,19 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			endIdx := startIdx + chunkSize
 			if endIdx >= len(blockTraceAndLog.Logs)  {
 				endIdx = len(blockTraceAndLog.Logs)
-			}
-			// move the end of the chunk to a "safe location"
-			// here, we move to "y" in type, which
-			// is the last field in a single object in result array
-			// we take care to avoid "callType" which is 
-			for j := endIdx; j < len(blockTraceAndLog.Traces); j++ {
-				if blockTraceAndLog.Traces[j] == y && blockTraceAndLog.Traces[j - 2] != l {
-					endIdx = j
-					break
+			} else {
+				// move the end of the chunk to a "safe location"
+				// here, we move to "y" in type, which
+				// is the last field in a single object in result array
+				// we take care to avoid "callType" which is 
+				for j := endIdx; j < len(blockTraceAndLog.Traces); j++ {
+					if blockTraceAndLog.Traces[j] == y && blockTraceAndLog.Traces[j - 2] != l {
+						endIdx = j
+						break
+					}
 				}
 			}
+			
 			fmt.Println(string(blockTraceAndLog.Traces[startIdx:endIdx]))
 			rangeChannelTraces <- Range{startIdx, endIdx}
 			startIdx = endIdx
@@ -277,16 +279,18 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			endIdx := startIdx + chunkSize
 			if endIdx >= len(blockTraceAndLog.Logs) {
 				endIdx = len(blockTraceAndLog.Logs) 
-			}
-			// move the end of the chunk to a "safe location"
-			// here, we move to the location of "y" in type, which
-			// is the last field in a single object in result array
-			for j := endIdx; j < len(blockTraceAndLog.Logs); j++ {
-				if blockTraceAndLog.Logs[j] == y {
-					endIdx = j
-					break
+			} else {
+				// move the end of the chunk to a "safe location"
+				// here, we move to the location of "y" in type, which
+				// is the last field in a single object in result array
+				for j := endIdx; j < len(blockTraceAndLog.Logs); j++ {
+					if blockTraceAndLog.Logs[j] == y {
+						endIdx = j
+						break
+					}
 				}
 			}
+			
 			rangeChannelLogs <- Range{startIdx, endIdx}
 			startIdx = endIdx
 		}
