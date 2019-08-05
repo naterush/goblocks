@@ -79,7 +79,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 				state = STATE_O
 			case STATE_T:
 				// READ IN "to"
-				fmt.Println("From to:", string(traces[index + 4: index + 4 + 42]))
+				//fmt.Println("From to:", string(traces[index + 4: index + 4 + 42]))
 				addressesInTrace[addressesIndex] = string(traces[index + 4: index + 4 + 42])
 				addressesIndex += 1
 
@@ -103,7 +103,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 
 				// Write out addresses to map
 				transactionPositionStr := leftPad(string(traces[transactionPositionStart: transactionPositionEnd]), 5)
-				fmt.Println("Transaction Position:", transactionPositionStr)
+				//fmt.Println("Transaction Position:", transactionPositionStr)
 
 				for j := 0; j < addressesIndex; j++ {
 					if goodAddr(addressesInTrace[j]) {
@@ -126,7 +126,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 		case u:
 			switch state {
 			case STATE_A:
-				fmt.Println("From author:", string(traces[index + 8: index + 8 + 42]))
+				//fmt.Println("From author:", string(traces[index + 8: index + 8 + 42]))
 				addressMap[string(traces[index + 8: index + 8 + 42]) + "\t" + blockNumStr + "\t" + "99999"] = true
 				// author
 				// Read in address
@@ -174,12 +174,12 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 			case STATE_START:
 				state = STATE_R
 			case STATE_D_AFTER_D:
-				fmt.Println("Should be address:", string(traces[index + 7: index + 7 + 42]))
+				//fmt.Println("Should be address:", string(traces[index + 7: index + 7 + 42]))
 				addressesInTrace[addressesIndex] = string(traces[index + 7: index + 7 + 42])
 				addressesIndex += 1
 				state = STATE_START
 			case STATE_F:
-				fmt.Println("Should be from:", string(traces[index + 6: index + 6 + 42]))
+				//fmt.Println("Should be from:", string(traces[index + 6: index + 6 + 42]))
 				addressesInTrace[addressesIndex] = string(traces[index + 6: index + 6 + 42])
 				addressesIndex += 1
 				state = STATE_START
@@ -198,7 +198,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 			case STATE_START:
 				state = STATE_F
 			case STATE_E:
-				fmt.Println("Should be refundAddress:", string(traces[index + 15: index + 15 + 42]))
+				//fmt.Println("Should be refundAddress:", string(traces[index + 15: index + 15 + 42]))
 				addressesInTrace[addressesIndex] = string(traces[index + 15: index + 15 + 42])
 				addressesIndex += 1
 				state = STATE_START
@@ -210,7 +210,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 			case STATE_START:
 				state = STATE_I
 			case STATE_N:
-				fmt.Println("Should be init:", string(traces[index + 5: index + 7]))
+				//fmt.Println("Should be init:", string(traces[index + 5: index + 7]))
 				startIndex := index + 5
 				endIndex := index + 5
 				for j := startIndex; j < len(traces); j++ {
@@ -248,7 +248,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 		case p:
 			switch state {
 			case STATE_N:
-				fmt.Println("Should be input:", string(traces[index + 6: index + 8]))
+				//fmt.Println("Should be input:", string(traces[index + 6: index + 8]))
 				startIndex := index + 6
 				endIndex := index + 6
 				for j := startIndex; j < len(traces); j++ {
@@ -357,7 +357,7 @@ func LogStateMachine(logs []byte, addressMap map[string]bool) {
 						break
 					}
 				}
-				fmt.Println("TOPICS:", string(logs[startIndex: endIndex]))
+				//fmt.Println("TOPICS:", string(logs[startIndex: endIndex]))
 
 				// jump by 69
 				for j := startIndex; j <= endIndex ; j+= 69 {
@@ -396,7 +396,7 @@ func LogStateMachine(logs []byte, addressMap map[string]bool) {
 						break
 					}
 				}
-				fmt.Println("DATA:", string(logs[startIndex: endIndex]))
+				//fmt.Println("DATA:", string(logs[startIndex: endIndex]))
 
 				if startIndex + 2 <= endIndex {
 					data := logs[startIndex + 2: endIndex]
@@ -439,7 +439,7 @@ func LogStateMachine(logs []byte, addressMap map[string]bool) {
 
 				// Write out addresses to map
 				transactionPositionStr := leftPad(strconv.FormatInt(txIdx, 10), 5)
-				fmt.Println("Transaction Position:", transactionPositionStr)
+				//fmt.Println("Transaction Position:", transactionPositionStr)
 
 				for j := 0; j < addressesIndex; j++ {
 					if goodAddr(addressesInTrace[j]) {
