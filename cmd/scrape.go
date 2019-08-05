@@ -243,7 +243,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		//fmt.Println(string(blockTraceAndLog.Traces[:]))
 		for startIdx < len(blockTraceAndLog.Traces) {
 			endIdx := startIdx + chunkSize
-			if endIdx >= len(blockTraceAndLog.Logs) ||  {
+			if endIdx >= len(blockTraceAndLog.Logs)  {
 				endIdx = len(blockTraceAndLog.Logs) - 1
 			}
 			// move the end of the chunk to a "safe location"
@@ -273,7 +273,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		// Send the approprate ranges to the LogStateMachines
 		chunkSize = len(blockTraceAndLog.Logs) / 20 // amount each jawn processes
 		startIdx = 0
-		for startIdx <  len(blockTraceAndLog.Logs){
+		for startIdx < len(blockTraceAndLog.Logs) {
 			endIdx := startIdx + chunkSize
 			if endIdx >= len(blockTraceAndLog.Logs) {
 				endIdx = len(blockTraceAndLog.Logs) - 1
