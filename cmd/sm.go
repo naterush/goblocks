@@ -439,7 +439,7 @@ func LogStateMachine(logs []byte) map[string]bool {
 					}
 				}
 
-				txIdx := strconv.ParseInt(string(logs[transactionPositionStart: transactionPositionEnd]), 0, 64)				
+				txIdx, _ := strconv.ParseInt(string(logs[transactionPositionStart: transactionPositionEnd]), 0, 64)				
 
 				// Write out addresses to map
 				transactionPositionStr := leftPad(strconv.FormatInt(idxInt, 10), 5)
