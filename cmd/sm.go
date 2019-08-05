@@ -56,9 +56,22 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 	var addressesInTrace [5000]string
 	addressesIndex := 0
 
-	temp := bytes.Index(traces, []byte("blockNumber"))
-	fmt.Println("BLOCKNUMBER:", string(traces[temp + 13: temp + 25]))
+	// Get the block number
+	blockNumStartIndex := bytes.Index(traces, []byte("blockNumber")) + 13
+	blockNumEndIndex := 0
+	for j := blockNumEndIndex; j < len(traces); j++ {
+		if traces[j] == comma {
+			blockNumEndIndex = j
+			break
+		}
+	}
+
+	fmt.Println("BLOCKNUMBER:", string(traces[blockNumStartIndex: blockNumEndIndex]))
 	blockNumStr := "005000000"
+
+
+	transactionPositionEnd := index + 8
+	
 
 	for index := 0; index < len(traces); index++ {
 		token := traces[index]
