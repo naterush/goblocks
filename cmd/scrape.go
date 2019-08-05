@@ -235,6 +235,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		for i := 0; i < 20; i ++ {
 			go TraceStateMachine(blockTraceAndLog.Traces[:], rangeChannelTraces, addressChannel, blockNumberStr, &traceWG)
 		}
+		fmt.Println("\n\n\n")
 
 		// Send the approprate ranges to the TraceStateMachines
 		chunkSize := len(blockTraceAndLog.Traces) / 20 // amount each jawn processes
@@ -252,6 +253,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 					break
 				}
 			}
+			fmt.Println(string(blockTraceAndLog.Traces[startIdx:endIdx]))
 			rangeChannelTraces <- Range{startIdx, endIdx}
 			startIdx = endIdx
 		}
@@ -263,6 +265,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		for i := 0; i < 20; i ++ {
 			go LogStateMachine(blockTraceAndLog.Logs[:], rangeChannelLogs, addressChannel, blockNumberStr, &logWG)
 		}
+		fmt.Println("\n\n")
 
 		// Send the approprate ranges to the LogStateMachines
 		chunkSize = len(blockTraceAndLog.Logs) / 20 // amount each jawn processes
@@ -281,10 +284,11 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 				}
 			}
 			rangeChannelLogs <- Range{startIdx, endIdx}
+			fmt.Println(string(blockTraceAndLog.Logs[startIdx:endIdx]))
 			startIdx = endIdx
 		}
 		close(rangeChannelLogs)
-		
+
 		// Wait for the various state machines to finish
 		traceWG.Wait()
 		logWG.Wait()
