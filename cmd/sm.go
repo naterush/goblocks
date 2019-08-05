@@ -442,7 +442,7 @@ func LogStateMachine(logs []byte) map[string]bool {
 				txIdx, _ := strconv.ParseInt(string(logs[transactionPositionStart: transactionPositionEnd]), 0, 64)				
 
 				// Write out addresses to map
-				transactionPositionStr := leftPad(strconv.FormatInt(idxInt, 10), 5)
+				transactionPositionStr := leftPad(strconv.FormatInt(txIdx, 10), 5)
 				fmt.Println("Transaction Position:", transactionPositionStr)
 
 				for j := 0; j < addressesIndex; j++ {
