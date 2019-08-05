@@ -33,6 +33,10 @@ type Filter struct {
 	Toblock   string `json:"toBlock"`
 }
 
+type Range struct {
+	StartIdx int 
+	EndIdx int
+}
 
 // BlockInternals - carries both the traces and the logs for a block
 type BlockInternals struct {
@@ -210,6 +214,11 @@ func recieveAddresses(addressChannel chan string, recieveWG *sync.WaitGroup, blo
 	recieveWG.Done()
 }
 
+const (
+	straightCloseBracket = byte(93)
+	curlyCloseBracket = byte(125)
+)
+
 func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, addressWG *sync.WaitGroup, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
 
 	for blockTraceAndLog := range addressChannel {
@@ -222,38 +231,58 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 
 		var traceWG sync.WaitGroup
 		traceWG.Add(20)
-		chunkSize := len(blockTraceAndLog.Traces) / 20 // amount each jawn processes
+		rangeChannelTraces := make(chan Range)
 		for i := 0; i < 20; i ++ {
-			startIdx := i * chunkSize
-			endIdx := (i + 1) * chunkSize
-			if i != 19 {
-				// we overlap the processors, to make sure we get all the data
-				endIdx += 20
-			} else {
-				endIdx = len(blockTraceAndLog.Traces)
-			}
+			go TraceStateMachine(blockTraceAndLog.Traces[:], rangeChannelTraces, addressChannel, blockNumberStr, &traceWG)
+		}
 
-			go TraceStateMachine(blockTraceAndLog.Traces[startIdx:endIdx], addressChannel, blockNumberStr, &traceWG)
+		// Send the approprate ranges to the TraceStateMachines
+		chunkSize := len(blockTraceAndLog.Traces) / 20 // amount each jawn processes
+		startIdx := 0
+		for i := 0; i < 20; i ++ {
+			endIndex := startIndex + chunkSize
+			// move the end of the chunk to a "safe location"
+			// e.g. chunks must start and end on ], }
+			for j := endIndex; j < len(blockTraceAndLog.Traces); j++ {
+				if blockTraceAndLog.Traces[j] == straightCloseBracket || blockTraceAndLog.Traces[j] == curlyCloseBracket {
+					endIndex = j
+					break
+				}
+			}
+			rangeChannelTraces <- Range{startIdx, endIdx}
+			startIdx = endIdx
 		}
 
 		var logWG sync.WaitGroup
 		logWG.Add(20)
-		chunkSize = len(blockTraceAndLog.Logs) / 20 // amount each jawn processes
+		rangeChannelLogs := make(chan Range)
 		for i := 0; i < 20; i ++ {
-			startIdx := i * chunkSize
-			endIdx := (i + 1) * chunkSize
-			if i != 19 {
-				// we overlap the processors, to make sure we get all the data
-				endIdx += 20
-			} else {
-				endIdx = len(blockTraceAndLog.Logs)
-			}
-			go LogStateMachine(blockTraceAndLog.Logs[startIdx:endIdx], addressChannel, blockNumberStr, &logWG)
+			go LogStateMachine(blockTraceAndLog.Logs[startIdx:endIdx], rangeChannelLogs, addressChannel, blockNumberStr, &logWG)
 		}
 
+		// Send the approprate ranges to the LogStateMachines
+		chunkSize = len(blockTraceAndLog.Logs) / 20 // amount each jawn processes
+		startIdx = 0
+		for i := 0; i < 20; i ++ {
+			endIndex := startIndex + chunkSize
+			// move the end of the chunk to a "safe location"
+			// e.g. chunks must start and end on ], }
+			for j := endIndex; j < len(blockTraceAndLog.Traces); j++ {
+				if blockTraceAndLog.Logs[j] == straightCloseBracket || blockTraceAndLog.Logs[j] == curlyCloseBracket {
+					endIndex = j
+					break
+				}
+			}
+			rangeChannelLogs <- Range{startIdx, endIdx}
+			startIdx = endIdx
+		}
+
+		// Wait for the various state machines to finish
 		traceWG.Wait()
 		logWG.Wait()
+		// Close the address channel, to notify the address receiver all have been sent
 		close(addressChannel)
+		// wait for the address receiver to write out the file
 		recieveWG.Wait()
 	}
 	addressWG.Done()

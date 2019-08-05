@@ -6,7 +6,7 @@ import (
 )
 
 
-func TraceStateMachine(traces []byte, addressChannel chan string, blockNumStr string, traceWG *sync.WaitGroup){
+func TraceStateMachine(traces []byte, rangeChannel chan Range, addressChannel chan string, blockNumStr string, traceWG *sync.WaitGroup){
 	// States for the state machine
 	const (
 		STATE_START = iota
@@ -56,240 +56,243 @@ func TraceStateMachine(traces []byte, addressChannel chan string, blockNumStr st
 	var addressesInTrace [5000]string
 	addressesIndex := 0
 
-	for index := 0; index < len(traces); index++ {
-		token := traces[index]
-
-		switch token {
-		case a:
-			switch state {
-			case STATE_START:
-				state = STATE_A
-			default:
-				state = STATE_START
-			}
-		case d:
-			switch state {
-			case STATE_A:
-				state = STATE_D
-			case STATE_D:
-				state = STATE_D_AFTER_D
-			default:
-				state = STATE_START
-			}
-		case e:
-			switch state {
-			case STATE_R:
-				state = STATE_E
-			default:
-				state = STATE_START
-			}
-		case f:
-			switch state {
-			case STATE_START:
-				state = STATE_F
-			case STATE_E:
-				// refundAddress
-				addressesInTrace[addressesIndex] = string(traces[index + 15: index + 15 + 42])
-				addressesIndex += 1
-				index = index + 15 + 42
-				state = STATE_START
-			default:
-				state = STATE_START
-			}
-		case i:
-			switch state {
-			case STATE_START:
-				state = STATE_I
-			case STATE_N:
-				// init
-				startIndex := index + 5
-				endIndex := index + 5
-				for j := startIndex; j < len(traces); j++ {
-					if traces[j] == comma {
-						endIndex = j
-						break
-					}
+	for r := range rangeChannel {
+		for index := r.StartIndex; index < r.EndIndex; index++ {
+			token := traces[index]
+	
+			switch token {
+			case a:
+				switch state {
+				case STATE_START:
+					state = STATE_A
+				default:
+					state = STATE_START
 				}
-				index = endIndex
-
-				if startIndex + 10 < endIndex {
-					data := traces[startIndex + 10: endIndex]
-					for i := 0; i < len(data) / 64; i++ {
-						addr := string(data[i * 64 : (i + 1) * 64])
-						if potentialAddress(addr) {
-							addr = "0x" + string(addr[24:])
-							if goodAddr(addr) {
-								addressesInTrace[addressesIndex] = addr
-								addressesIndex += 1
+			case d:
+				switch state {
+				case STATE_A:
+					state = STATE_D
+				case STATE_D:
+					state = STATE_D_AFTER_D
+				default:
+					state = STATE_START
+				}
+			case e:
+				switch state {
+				case STATE_R:
+					state = STATE_E
+				default:
+					state = STATE_START
+				}
+			case f:
+				switch state {
+				case STATE_START:
+					state = STATE_F
+				case STATE_E:
+					// refundAddress
+					addressesInTrace[addressesIndex] = string(traces[index + 15: index + 15 + 42])
+					addressesIndex += 1
+					index = index + 15 + 42
+					state = STATE_START
+				default:
+					state = STATE_START
+				}
+			case i:
+				switch state {
+				case STATE_START:
+					state = STATE_I
+				case STATE_N:
+					// init
+					startIndex := index + 5
+					endIndex := index + 5
+					for j := startIndex; j < len(traces); j++ {
+						if traces[j] == comma {
+							endIndex = j
+							break
+						}
+					}
+					index = endIndex
+	
+					if startIndex + 10 < endIndex {
+						data := traces[startIndex + 10: endIndex]
+						for i := 0; i < len(data) / 64; i++ {
+							addr := string(data[i * 64 : (i + 1) * 64])
+							if potentialAddress(addr) {
+								addr = "0x" + string(addr[24:])
+								if goodAddr(addr) {
+									addressesInTrace[addressesIndex] = addr
+									addressesIndex += 1
+								}
 							}
 						}
 					}
+	
+					state = STATE_START
+				default:
+					state = STATE_START
 				}
-
-				state = STATE_START
-			default:
-				state = STATE_START
-			}
-		case n:
-			switch state {
-			case STATE_I:
-				state = STATE_N
-			default:
-				state = STATE_START
-			}
-		case o:
-			switch state {
-			case STATE_START:
-				state = STATE_O
-			case STATE_T:
-				//fmt.Println("From to:", string(traces[index + 4: index + 4 + 42]))
-				addressesInTrace[addressesIndex] = string(traces[index + 4: index + 4 + 42])
-				addressesIndex += 1
-				index = index + 4 + 42
-				state = STATE_START
-			case STATE_P_CAP:
-				state = STATE_O_AFTER_P_CAP
-			default:
-				state = STATE_START
-			}
-		case p:
-			switch state {
-			case STATE_N:
-				// Input
-				startIndex := index + 6
-				endIndex := index + 6
-				for j := startIndex; j < len(traces); j++ {
-					if traces[j] == comma {
-						endIndex = j
-						break
+			case n:
+				switch state {
+				case STATE_I:
+					state = STATE_N
+				default:
+					state = STATE_START
+				}
+			case o:
+				switch state {
+				case STATE_START:
+					state = STATE_O
+				case STATE_T:
+					//fmt.Println("From to:", string(traces[index + 4: index + 4 + 42]))
+					addressesInTrace[addressesIndex] = string(traces[index + 4: index + 4 + 42])
+					addressesIndex += 1
+					index = index + 4 + 42
+					state = STATE_START
+				case STATE_P_CAP:
+					state = STATE_O_AFTER_P_CAP
+				default:
+					state = STATE_START
+				}
+			case p:
+				switch state {
+				case STATE_N:
+					// Input
+					startIndex := index + 6
+					endIndex := index + 6
+					for j := startIndex; j < len(traces); j++ {
+						if traces[j] == comma {
+							endIndex = j
+							break
+						}
 					}
-				}
-				index = endIndex
-
-				if startIndex + 10 < endIndex {
-					data := traces[startIndex + 10: endIndex]
-					for i := 0; i < len(data) / 64; i++ {
-						addr := string(data[i * 64 : (i + 1) * 64])
-						if potentialAddress(addr) {
-							addr = "0x" + string(addr[24:])
-							if goodAddr(addr) {
-								addressesInTrace[addressesIndex] = addr
-								addressesIndex += 1
+					index = endIndex
+	
+					if startIndex + 10 < endIndex {
+						data := traces[startIndex + 10: endIndex]
+						for i := 0; i < len(data) / 64; i++ {
+							addr := string(data[i * 64 : (i + 1) * 64])
+							if potentialAddress(addr) {
+								addr = "0x" + string(addr[24:])
+								if goodAddr(addr) {
+									addressesInTrace[addressesIndex] = addr
+									addressesIndex += 1
+								}
 							}
 						}
 					}
+					state = STATE_START
+				default:
+					state = STATE_START
 				}
-				state = STATE_START
-			default:
-				state = STATE_START
-			}
-		case r:
-			switch state {
-			case STATE_START:
-				state = STATE_R
-			case STATE_D_AFTER_D:
-				// Address
-				addressesInTrace[addressesIndex] = string(traces[index + 7: index + 7 + 42])
-				addressesIndex += 1
-				index = index + 7 + 42
-				state = STATE_START
-			case STATE_F:
-				// From
-				addressesInTrace[addressesIndex] = string(traces[index + 6: index + 6 + 42])
-				addressesIndex += 1
-				index = index + 6 + 42
-				state = STATE_START
-			default:
-				state = STATE_START
-			}
-		case s:
-			switch state {
-			case STATE_O_AFTER_P_CAP:
-				transactionPositionStart :=  index + 8
-				transactionPositionEnd := index + 8
-				for j := transactionPositionStart; j < len(traces); j++ {
-					if traces[j] == comma {
-						transactionPositionEnd = j
-						break
+			case r:
+				switch state {
+				case STATE_START:
+					state = STATE_R
+				case STATE_D_AFTER_D:
+					// Address
+					addressesInTrace[addressesIndex] = string(traces[index + 7: index + 7 + 42])
+					addressesIndex += 1
+					index = index + 7 + 42
+					state = STATE_START
+				case STATE_F:
+					// From
+					addressesInTrace[addressesIndex] = string(traces[index + 6: index + 6 + 42])
+					addressesIndex += 1
+					index = index + 6 + 42
+					state = STATE_START
+				default:
+					state = STATE_START
+				}
+			case s:
+				switch state {
+				case STATE_O_AFTER_P_CAP:
+					transactionPositionStart :=  index + 8
+					transactionPositionEnd := index + 8
+					for j := transactionPositionStart; j < len(traces); j++ {
+						if traces[j] == comma {
+							transactionPositionEnd = j
+							break
+						}
 					}
-				}
-				index = transactionPositionEnd
-				transactionPositionStr := leftPad(string(traces[transactionPositionStart: transactionPositionEnd]), 5)
-				blockAndIndex := "\t" + blockNumStr + "\t" + transactionPositionStr
-
-				// Write out addresses to map
-				for j := 0; j < addressesIndex; j++ {
-					if goodAddr(addressesInTrace[j]) {
-						addressChannel <- addressesInTrace[j] + blockAndIndex
+					index = transactionPositionEnd
+					transactionPositionStr := leftPad(string(traces[transactionPositionStart: transactionPositionEnd]), 5)
+					blockAndIndex := "\t" + blockNumStr + "\t" + transactionPositionStr
+	
+					// Write out addresses to map
+					for j := 0; j < addressesIndex; j++ {
+						if goodAddr(addressesInTrace[j]) {
+							addressChannel <- addressesInTrace[j] + blockAndIndex
+						}
 					}
+					addressesIndex = 0
+	
+					state = STATE_START
+				default:
+					state = STATE_START
 				}
-				addressesIndex = 0
-
-				state = STATE_START
-			default:
-				state = STATE_START
-			}
-		case t:
-			switch state {
-			case STATE_START:
-				state = STATE_T
-			case STATE_U_AFTER_O:
-				state = STATE_T_AFTER_OU
-			default:
-				state = STATE_START
-			}
-		case u:
-			switch state {
-			case STATE_A:
-				// Author
-				addressChannel <- string(traces[index + 8: index + 8 + 42]) + "\t" + blockNumStr + "\t" + "99999"
-				state = STATE_START
-			case STATE_O:
-				// Output
-				startIndex := index + 8
-				endIndex := index + 8
-				for j := startIndex; j < len(traces); j++ {
-					if traces[j] == comma {
-						endIndex = j
-						break
+			case t:
+				switch state {
+				case STATE_START:
+					state = STATE_T
+				case STATE_U_AFTER_O:
+					state = STATE_T_AFTER_OU
+				default:
+					state = STATE_START
+				}
+			case u:
+				switch state {
+				case STATE_A:
+					// Author
+					addressChannel <- string(traces[index + 8: index + 8 + 42]) + "\t" + blockNumStr + "\t" + "99999"
+					state = STATE_START
+				case STATE_O:
+					// Output
+					startIndex := index + 8
+					endIndex := index + 8
+					for j := startIndex; j < len(traces); j++ {
+						if traces[j] == comma {
+							endIndex = j
+							break
+						}
 					}
-				}
-				index = endIndex
-
-				if startIndex + 10 < endIndex {
-					data := traces[startIndex + 10: endIndex]
-					for i := 0; i < len(data) / 64; i++ {
-						addr := string(data[i * 64 : (i + 1) * 64])
-						if potentialAddress(addr) {
-							addr = "0x" + string(addr[24:])
-							if goodAddr(addr) {
-								addressesInTrace[addressesIndex] = addr
-								addressesIndex += 1
+					index = endIndex
+	
+					if startIndex + 10 < endIndex {
+						data := traces[startIndex + 10: endIndex]
+						for i := 0; i < len(data) / 64; i++ {
+							addr := string(data[i * 64 : (i + 1) * 64])
+							if potentialAddress(addr) {
+								addr = "0x" + string(addr[24:])
+								if goodAddr(addr) {
+									addressesInTrace[addressesIndex] = addr
+									addressesIndex += 1
+								}
 							}
 						}
 					}
+					state = STATE_START
+				default:
+					state = STATE_START
 				}
-				state = STATE_START
+			case P:
+				switch state {
+				case STATE_START:
+					state = STATE_P_CAP
+				default:
+					state = STATE_START
+				}
 			default:
 				state = STATE_START
 			}
-		case P:
-			switch state {
-			case STATE_START:
-				state = STATE_P_CAP
-			default:
-				state = STATE_START
-			}
-		default:
-			state = STATE_START
 		}
 	}
+
 	traceWG.Done()
 }
 
 
 
-func LogStateMachine(logs []byte, addressChannel chan string, blockNumStr string, logWG *sync.WaitGroup) {
+func LogStateMachine(logs []byte, rangeChannel chan Range, addressChannel chan string, blockNumStr string, logWG *sync.WaitGroup) {
 	// States for the state machine
 	const (
 		STATE_START = iota
@@ -324,30 +327,83 @@ func LogStateMachine(logs []byte, addressChannel chan string, blockNumStr string
 	var addressesInTrace [5000]string
 	addressesIndex := 0
 
-	for index := 0; index < len(logs); index++ {
-		token := logs[index]
-
-		switch token {
-		case a:
-			switch state {
-			case STATE_D:
-				state = STATE_A
-			case STATE_T_AFTER_A:
-				// Input
-				startIndex := index + 4
-				endIndex := index + 4
-				for j := startIndex; j < len(logs); j++ {
-					if logs[j] == comma {
-						endIndex = j - 1
-						break
+	for r := range rangeChannel {
+		for index := r.StartIndex; index < r.EndIndex; index++ {
+			token := logs[index]
+	
+			switch token {
+			case a:
+				switch state {
+				case STATE_D:
+					state = STATE_A
+				case STATE_T_AFTER_A:
+					// Input
+					startIndex := index + 4
+					endIndex := index + 4
+					for j := startIndex; j < len(logs); j++ {
+						if logs[j] == comma {
+							endIndex = j - 1
+							break
+						}
 					}
+					index = endIndex
+	
+					if startIndex + 2 <= endIndex {
+						data := logs[startIndex + 2: endIndex]
+						for i := 0; i < len(data) / 64; i++ {
+							addr := string(data[i*64 : (i + 1) * 64])
+							if potentialAddress(addr) {
+								addr = "0x" + string(addr[24:])
+								if goodAddr(addr) {
+									addressesInTrace[addressesIndex] = addr
+									addressesIndex += 1
+								}
+							}
+						}
+					}
+	
+					state = STATE_START
+				default:
+					state = STATE_START
 				}
-				index = endIndex
-
-				if startIndex + 2 <= endIndex {
-					data := logs[startIndex + 2: endIndex]
-					for i := 0; i < len(data) / 64; i++ {
-						addr := string(data[i*64 : (i + 1) * 64])
+			case d:
+				switch state {
+				case STATE_START:
+					state = STATE_D
+				default:
+					state = STATE_START
+				}
+			case n:
+				switch state {
+				case STATE_START:
+					state = STATE_N
+				default:
+					state = STATE_START
+				}
+			case o:
+				switch state {
+				case STATE_T:
+					state = STATE_O
+				default:
+					state = STATE_START
+				}
+			case p:
+				switch state {
+				case STATE_O:
+					// Topics
+					startIndex := index + 7
+					endIndex := index + 4
+					for j := startIndex; j < len(logs); j++ {
+						if logs[j] == closeBracketStraight {
+							endIndex = j
+							break
+						}
+					}
+					index = endIndex
+	
+					// jump by 69
+					for j := startIndex; j <= endIndex ; j+= 69 {
+						addr := string(logs[j + 1 + 2: j + 1 + 66])
 						if potentialAddress(addr) {
 							addr = "0x" + string(addr[24:])
 							if goodAddr(addr) {
@@ -356,102 +412,51 @@ func LogStateMachine(logs []byte, addressChannel chan string, blockNumStr string
 							}
 						}
 					}
+	
+					state = STATE_START
+				default:
+					state = STATE_START
 				}
-
-				state = STATE_START
-			default:
-				state = STATE_START
-			}
-		case d:
-			switch state {
-			case STATE_START:
-				state = STATE_D
-			default:
-				state = STATE_START
-			}
-		case n:
-			switch state {
-			case STATE_START:
-				state = STATE_N
-			default:
-				state = STATE_START
-			}
-		case o:
-			switch state {
-			case STATE_T:
-				state = STATE_O
-			default:
-				state = STATE_START
-			}
-		case p:
-			switch state {
-			case STATE_O:
-				// Topics
-				startIndex := index + 7
-				endIndex := index + 4
-				for j := startIndex; j < len(logs); j++ {
-					if logs[j] == closeBracketStraight {
-						endIndex = j
-						break
-					}
+			case t:
+				switch state {
+				case STATE_START:
+					state = STATE_T
+				case STATE_A:
+					state = STATE_T_AFTER_A
+				default:
+					state = STATE_START
 				}
-				index = endIndex
-
-				// jump by 69
-				for j := startIndex; j <= endIndex ; j+= 69 {
-					addr := string(logs[j + 1 + 2: j + 1 + 66])
-					if potentialAddress(addr) {
-						addr = "0x" + string(addr[24:])
-						if goodAddr(addr) {
-							addressesInTrace[addressesIndex] = addr
-							addressesIndex += 1
+			case I:
+				switch state {
+				case STATE_N:
+					// transactionIndex
+					transactionPositionStart :=  index + 8
+					transactionPositionEnd := index + 8
+					for j := transactionPositionStart; j < len(logs); j++ {
+						if logs[j] == comma {
+							transactionPositionEnd = j - 1
+							break
 						}
 					}
-				}
-
-				state = STATE_START
-			default:
-				state = STATE_START
-			}
-		case t:
-			switch state {
-			case STATE_START:
-				state = STATE_T
-			case STATE_A:
-				state = STATE_T_AFTER_A
-			default:
-				state = STATE_START
-			}
-		case I:
-			switch state {
-			case STATE_N:
-				// transactionIndex
-				transactionPositionStart :=  index + 8
-				transactionPositionEnd := index + 8
-				for j := transactionPositionStart; j < len(logs); j++ {
-					if logs[j] == comma {
-						transactionPositionEnd = j - 1
-						break
+					index = transactionPositionEnd
+	
+					txIdx, _ := strconv.ParseInt(string(logs[transactionPositionStart: transactionPositionEnd]), 0, 64)
+					transactionPositionStr := leftPad(strconv.FormatInt(txIdx, 10), 5)
+	
+					for j := 0; j < addressesIndex; j++ {
+						if goodAddr(addressesInTrace[j]) {
+							addressChannel <- addressesInTrace[j] + "\t" + blockNumStr + "\t" + transactionPositionStr
+						}
 					}
+					addressesIndex = 0
+	
+					state = STATE_START
+				default:
+					state = STATE_START
 				}
-				index = transactionPositionEnd
-
-				txIdx, _ := strconv.ParseInt(string(logs[transactionPositionStart: transactionPositionEnd]), 0, 64)
-				transactionPositionStr := leftPad(strconv.FormatInt(txIdx, 10), 5)
-
-				for j := 0; j < addressesIndex; j++ {
-					if goodAddr(addressesInTrace[j]) {
-						addressChannel <- addressesInTrace[j] + "\t" + blockNumStr + "\t" + transactionPositionStr
-					}
-				}
-				addressesIndex = 0
-
-				state = STATE_START
 			default:
 				state = STATE_START
 			}
-		default:
-			state = STATE_START
 		}
 	}
 	logWG.Done()
