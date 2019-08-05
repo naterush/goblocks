@@ -51,10 +51,10 @@ func TraceStateMachine(traces []byte) map[string]bool {
 
 	// Keep track of these indexes
 	const MAX_ADDRESSES_IN_TRACE = 1000
-	//var addressesInTrace [5000]string
-	//addressesIndex := 0
+	var addressesInTrace [5000]string
+	addressesIndex := 0
 
-	//blockNumStr := "005000000"
+	blockNumStr := "005000000"
 
 	// Address + block + index store
 	addressMap := make(map[string]bool)
@@ -315,11 +315,11 @@ func LogStateMachine(traces []byte) map[string]bool {
 	//closeBracketStraight := byte(93) // byte value of ] TODO: this might be wrong!, but i don't really need it
 
 	// Keep track of these indexes
-	const MAX_ADDRESSES_IN_TRACE = 1000
-	var addressesInTrace [5000]string
-	addressesIndex := 0
+	//const MAX_ADDRESSES_IN_TRACE = 1000
+	//var addressesInTrace [5000]string
+	//addressesIndex := 0
 
-	blockNumStr := "005000000"
+	//blockNumStr := "005000000"
 
 	// Address + block + index store
 	addressMap := make(map[string]bool)
