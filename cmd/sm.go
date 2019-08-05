@@ -333,9 +333,9 @@ func LogStateMachine(logs []byte, addressMap map[string]bool) {
 	var addressesInTrace [5000]string
 	addressesIndex := 0
 
-	blockNumStartIndex := bytes.Index(logs, []byte("blockNumber")) + 13
+	blockNumStartIndex := bytes.Index(logs, []byte("blockNumber")) + 14
 	blockNumEndIndex := blockNumStartIndex
-	for j := blockNumStartIndex + 1; j < len(logs); j++ {
+	for j := blockNumStartIndex; j < len(logs); j++ {
 		if logs[j] == quote {
 			blockNumEndIndex = j
 			break
