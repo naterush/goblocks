@@ -6,7 +6,7 @@ import (
 )
 
 
-func TraceStateMachine(traces []byte, addressMap map[string]bool){
+func TraceStateMachine(traces []byte, addressMap map[string]bool, blockNumStr string){
 	// Declare all the states we need
 	const (
 		STATE_START = iota
@@ -54,19 +54,6 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 	const MAX_ADDRESSES_IN_TRACE = 1000
 	var addressesInTrace [5000]string
 	addressesIndex := 0
-
-	// Get the block number
-	blockNumStartIndex := bytes.Index(traces, []byte("blockNumber")) + 13
-	blockNumEndIndex := blockNumStartIndex
-	for j := blockNumStartIndex; j < len(traces); j++ {
-		if traces[j] == comma {
-			blockNumEndIndex = j
-			break
-		}
-	}
-
-	blockNumStr := leftPad(string(traces[blockNumStartIndex: blockNumEndIndex]), 9)
-	
 
 	for index := 0; index < len(traces); index++ {
 		token := traces[index]
@@ -298,7 +285,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 
 
 
-func LogStateMachine(logs []byte, addressMap map[string]bool) {
+func LogStateMachine(logs []byte, addressMap map[string]bool, blockNumStr string) {
 	// Declare all the states we need
 	const (
 		STATE_START = iota
@@ -331,18 +318,6 @@ func LogStateMachine(logs []byte, addressMap map[string]bool) {
 	const MAX_ADDRESSES_IN_TRACE = 1000
 	var addressesInTrace [5000]string
 	addressesIndex := 0
-
-	blockNumStartIndex := bytes.Index(logs, []byte("blockNumber")) + 14
-	blockNumEndIndex := blockNumStartIndex
-	for j := blockNumStartIndex; j < len(logs); j++ {
-		if logs[j] == quote {
-			blockNumEndIndex = j
-			break
-		}
-	}
-
-	blockNum, _ := strconv.ParseInt(string(logs[blockNumStartIndex: blockNumEndIndex]), 0, 64)			
-	blockNumStr :=  leftPad(strconv.FormatInt(blockNum, 10), 9)
 
 	for index := 0; index < len(logs); index++ {
 		token := logs[index]
