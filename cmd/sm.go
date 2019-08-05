@@ -290,7 +290,7 @@ func TraceStateMachine(traces []byte) map[string]bool {
 
 
 
-func LogStateMachine(traces []byte) map[string]bool {
+func LogStateMachine(logs []byte) map[string]bool {
 	// Declare all the states we need
 	const (
 		STATE_START = iota
@@ -324,8 +324,8 @@ func LogStateMachine(traces []byte) map[string]bool {
 	// Address + block + index store
 	addressMap := make(map[string]bool)
 
-	for index := 0; index < len(traces); index++ {
-		token := traces[index]
+	for index := 0; index < len(logs); index++ {
+		token := logs[index]
 
 		switch token {
 		case t:
@@ -348,6 +348,7 @@ func LogStateMachine(traces []byte) map[string]bool {
 			switch state {
 			case STATE_O:
 				// Read in the topics
+				fmt.Println("TOPICS:", logs[index: index + 10])
 				
 
 				state = STATE_START
@@ -367,6 +368,8 @@ func LogStateMachine(traces []byte) map[string]bool {
 				state = STATE_A
 			case STATE_T_AFTER_A:
 				// Read in the input data!
+				fmt.Println("DATA:", logs[index: index + 10])
+
 				state = STATE_START
 			default:
 				state = STATE_START
