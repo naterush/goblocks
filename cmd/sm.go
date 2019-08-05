@@ -133,7 +133,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 				// move index forward
 				state = STATE_START
 			case STATE_O:
-				fmt.Println("Should be output:", string(traces[index + 8: index + 10]))
+				//fmt.Println("Should be output:", string(traces[index + 8: index + 10]))
 				startIndex := index + 8
 				endIndex := index + 8
 				for j := startIndex; j < len(traces); j++ {
