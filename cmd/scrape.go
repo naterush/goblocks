@@ -257,7 +257,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		logWG.Add(20)
 		rangeChannelLogs := make(chan Range)
 		for i := 0; i < 20; i ++ {
-			go LogStateMachine(blockTraceAndLog.Logs[startIdx:endIdx], rangeChannelLogs, addressChannel, blockNumberStr, &logWG)
+			go LogStateMachine(blockTraceAndLog.Logs[:], rangeChannelLogs, addressChannel, blockNumberStr, &logWG)
 		}
 
 		// Send the approprate ranges to the LogStateMachines
