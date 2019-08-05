@@ -66,8 +66,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 		}
 	}
 
-	fmt.Println("BLOCKNUMBER:", string(traces[blockNumStartIndex: blockNumEndIndex]))
-	blockNumStr := "005000000"
+	blockNumStr := leftPad(string(traces[blockNumStartIndex: blockNumEndIndex]), 9)
 	
 
 	for index := 0; index < len(traces); index++ {
@@ -323,6 +322,7 @@ func LogStateMachine(logs []byte, addressMap map[string]bool) {
 	n := []byte("n")[0]
 	I := []byte("I")[0]
 	comma := []byte(",")[0]
+	quote := byte(34)
 	//openBracket := byte(123) // byte value of {
 	//closeBracket := byte(125) // byte value of }
 	//openBracketStraight := byte(91) // byte value of [
@@ -333,7 +333,18 @@ func LogStateMachine(logs []byte, addressMap map[string]bool) {
 	var addressesInTrace [5000]string
 	addressesIndex := 0
 
-	blockNumStr := "005000000"
+	blockNumStartIndex := bytes.Index(traces, []byte("blockNumber")) + 13
+	blockNumEndIndex := blockNumStartIndex
+	for j := blockNumStartIndex; j < len(traces); j++ {
+		if traces[j] == quote {
+			blockNumEndIndex = j
+			break
+		}
+	}
+
+	blockNum, _ := strconv.ParseInt(string(logs[blockNumStartIndex: blockNumEndIndex]), 0, 64)				
+	blockNumStr :=  leftPad(strconv.FormatInt(blockNum, 10), 5)
+
 
 	for index := 0; index < len(logs); index++ {
 		token := logs[index]
