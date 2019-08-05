@@ -372,7 +372,7 @@ func LogStateMachine(logs []byte) map[string]bool {
 				endIndex := index + 4
 				for j := startIndex; j < len(logs); j++ {
 					if logs[j] == comma {
-						endIndex = j
+						endIndex = j - 1
 						break
 					}
 				}
