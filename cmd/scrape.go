@@ -201,7 +201,7 @@ func getTracesAndLogs(rpcProvider string, blockChannel chan int, addressChannel 
 }
 
 
-func recieveAddresses(addressChannel chan string, blockNumStr string, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
+func recieveAddresses(addressChannel chan string, blockNumberStr string, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
 	addressMap := make(map[string]bool)
 	for addressSighting := range addressChannel {
 		addressMap[addressSighting] = true
