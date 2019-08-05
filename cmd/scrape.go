@@ -343,7 +343,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		addressMapNew := make(map[string]bool) 
 		TraceStateMachine(blockTraceAndLog.Traces, addressMapNew, blockNumberStr)
 		LogStateMachine(blockTraceAndLog.Logs, addressMapNew, blockNumberStr)
-		writeAddresses("SM" + blockNumberStr, addressMapNew, nBlocks, ripeBlock, unripePath, ripePath)
+		writeAddresses(blockNumberStr, addressMapNew, nBlocks, ripeBlock, unripePath, ripePath)
 	}
 	addressWG.Done()
 }
