@@ -217,6 +217,7 @@ func recieveAddresses(addressChannel chan string, recieveWG *sync.WaitGroup, blo
 const (
 	straightCloseBracket = byte(93)
 	curlyCloseBracket = byte(125)
+	y = byte(121)
 )
 
 func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, addressWG *sync.WaitGroup, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
@@ -246,7 +247,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 				endIdx = len(blockTraceAndLog.Logs) - 1
 			}
 			// move the end of the chunk to a "safe location"
-			// e.g. chunks must start and end on ], }
+			// here, we move to 
 			for j := endIdx; j < len(blockTraceAndLog.Traces); j++ {
 				if blockTraceAndLog.Traces[j] == straightCloseBracket || blockTraceAndLog.Traces[j] == curlyCloseBracket {
 					endIdx = j
@@ -276,9 +277,10 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 				endIdx = len(blockTraceAndLog.Logs) - 1
 			}
 			// move the end of the chunk to a "safe location"
-			// e.g. chunks must start and end on ], }
+			// here, we move to the location of "y" in type, which
+			// is the last field in a single object in result array
 			for j := endIdx; j < len(blockTraceAndLog.Logs); j++ {
-				if blockTraceAndLog.Logs[j] == straightCloseBracket || blockTraceAndLog.Logs[j] == curlyCloseBracket {
+				if blockTraceAndLog.Logs[j] == y {
 					endIdx = j
 					break
 				}
