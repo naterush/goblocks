@@ -286,7 +286,6 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 				}
 			}
 			rangeChannelLogs <- Range{startIdx, endIdx}
-			fmt.Println(string(blockTraceAndLog.Logs[startIdx:endIdx]))
 			startIdx = endIdx
 		}
 		close(rangeChannelLogs)
