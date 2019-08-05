@@ -57,7 +57,7 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 	addressesIndex := 0
 
 	temp := bytes.Index(traces, []byte("blockNumber"))
-	fmt.Println("BLOCKNUMBER:", string(traces[temp: temp + 10]))
+	fmt.Println("BLOCKNUMBER:", string(traces[temp + 13: temp + 20]))
 	blockNumStr := "005000000"
 
 	for index := 0; index < len(traces); index++ {
