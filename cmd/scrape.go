@@ -206,9 +206,42 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		
 		addressMap := make(map[string]bool)
 		blockNumberStr := leftPad(strconv.Itoa(blockTraceAndLog.BlockNumber), 9)
-		TraceStateMachine(blockTraceAndLog.Traces, addressMap, blockNumberStr)
-		LogStateMachine(blockTraceAndLog.Logs, addressMap, blockNumberStr)
-		writeAddresses(blockNumberStr, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
+
+		var traceWG sync.WaitGroup
+		traceWG.Add(20)
+		chunkSize := len(blockTraceAndLog.Traces) / 20 // amount each jawn processes
+		for i := 0; i < 20; i ++ {
+			startIdx := i * chunkSize
+			endIdx := (i + 1) * chunkSize
+			if i != 19 {
+				// we overlap the processors, to make sure we get all the data
+				endIdx += 20
+			} else {
+				endIdx = len(blockTraceAndLog.Traces)
+			}
+
+			go TraceStateMachine(blockTraceAndLog.Traces[startIdx:endIdx], addressMap, blockNumberStr, &traceWG)
+		}
+
+		var logWG sync.WaitGroup
+		logWG.Add(20)
+		chunkSize := len(blockTraceAndLog.Logs) / 20 // amount each jawn processes
+		for i := 0; i < 20; i ++ {
+			startIdx := i * chunkSize
+			endIdx := (i + 1) * chunkSize
+			if i != 19 {
+				// we overlap the processors, to make sure we get all the data
+				endIdx += 20
+			} else {
+				endIdx = len(blockTraceAndLog.Logs)
+			}
+			go LogStateMachine(blockTraceAndLog.Logs[startIdx:endIdx], addressMap, blockNumberStr)
+		}
+
+		traceWG.Wait()
+		logWG.Wait()
+
+		writeAddresses("SM" + blockNumberStr, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
 	}
 	addressWG.Done()
 }

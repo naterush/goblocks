@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"strconv"
+	"sync"
 )
 
 
-func TraceStateMachine(traces []byte, addressMap map[string]bool, blockNumStr string){
+func TraceStateMachine(traces []byte, addressMap map[string]bool, blockNumStr string, traceWG *sync.WaitGroup){
 	// States for the state machine
 	const (
 		STATE_START = iota
@@ -283,11 +284,12 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool, blockNumStr st
 			state = STATE_START
 		}
 	}
+	traceWG.Done()
 }
 
 
 
-func LogStateMachine(logs []byte, addressMap map[string]bool, blockNumStr string) {
+func LogStateMachine(logs []byte, addressMap map[string]bool, blockNumStr string, logWG *sync.WaitGroup) {
 	// States for the state machine
 	const (
 		STATE_START = iota
@@ -452,4 +454,5 @@ func LogStateMachine(logs []byte, addressMap map[string]bool, blockNumStr string
 			state = STATE_START
 		}
 	}
+	logWG.Done()
 }
