@@ -68,9 +68,6 @@ func TraceStateMachine(traces []byte, addressMap map[string]bool){
 
 	fmt.Println("BLOCKNUMBER:", string(traces[blockNumStartIndex: blockNumEndIndex]))
 	blockNumStr := "005000000"
-
-
-	transactionPositionEnd := index + 8
 	
 
 	for index := 0; index < len(traces); index++ {
