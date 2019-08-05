@@ -215,8 +215,7 @@ func recieveAddresses(addressChannel chan string, recieveWG *sync.WaitGroup, blo
 }
 
 const (
-	straightCloseBracket = byte(93)
-	curlyCloseBracket = byte(125)
+	l = byte(108)
 	y = byte(121)
 )
 
@@ -241,21 +240,23 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		// Send the approprate ranges to the TraceStateMachines
 		chunkSize := len(blockTraceAndLog.Traces) / 20 // amount each jawn processes
 		startIdx := 0
-		fmt.Println(string(blockTraceAndLog.Traces[:]))
+		//fmt.Println(string(blockTraceAndLog.Traces[:]))
 		for i := 0; i < 20; i ++ {
 			endIdx := startIdx + chunkSize
 			if endIdx >= len(blockTraceAndLog.Logs) {
 				endIdx = len(blockTraceAndLog.Logs) - 1
 			}
 			// move the end of the chunk to a "safe location"
-			// here, we move to 
+			// here, we move to "y" in type, which
+			// is the last field in a single object in result array
+			// we take care to avoid "callType" which is 
 			for j := endIdx; j < len(blockTraceAndLog.Traces); j++ {
-				if blockTraceAndLog.Traces[j] == straightCloseBracket || blockTraceAndLog.Traces[j] == curlyCloseBracket {
+				if blockTraceAndLog.Traces[j] == y && blockTraceAndLog.Traces[j - 2] != l {
 					endIdx = j
 					break
 				}
 			}
-			//fmt.Println(string(blockTraceAndLog.Traces[startIdx:endIdx]))
+			fmt.Println(string(blockTraceAndLog.Traces[startIdx:endIdx]))
 			rangeChannelTraces <- Range{startIdx, endIdx}
 			startIdx = endIdx
 		}
