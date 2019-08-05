@@ -307,6 +307,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		addressMap := make(map[string]bool)
 
 		// Parse the traces
+		/*
 		var traces BlockTraces
 		err := json.Unmarshal(blockTraceAndLog.Traces, &traces)
 		if err != nil {
@@ -317,14 +318,13 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		if traces.Result != nil && len(traces.Result) > 0 {
 			blockNum = leftPad(strconv.Itoa(traces.Result[0].BlockNumber), 9)
 			extractAddressesFromTraces(rpcProvider, addressMap, &traces, blockNum)
-		}
-		writeAddresses(blockNum, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
+		} */
 		newAddressMap := TraceStateMachine(blockTraceAndLog.Traces)
 		writeAddresses("SM" + blockNum, newAddressMap, nBlocks, ripeBlock, unripePath, ripePath)
 
-		LogStateMachine(blockTraceAndLog.Logs)
+		addressMap := LogStateMachine(blockTraceAndLog.Logs)
 
-		/*
+		
 		// Now, parse log data
 		var logs BlockLogs
 		err = json.Unmarshal(blockTraceAndLog.Logs, &logs)
@@ -338,7 +338,9 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		if blockNum != "" {
 			extractAddressesFromLogs(addressMap, &logs, blockNum)
 			writeAddresses(blockNum, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
-		} */
+		} 
+		writeAddresses(blockNum, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
+
 
 	}
 	addressWG.Done()
