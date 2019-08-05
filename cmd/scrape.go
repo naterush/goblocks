@@ -321,7 +321,9 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		writeAddresses(blockNum, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
 		newAddressMap := TraceStateMachine(blockTraceAndLog.Traces)
 		writeAddresses("SM" + blockNum, newAddressMap, nBlocks, ripeBlock, unripePath, ripePath)
-		fmt.Println(string(blockTraceAndLog.Logs))
+
+		LogStateMachine(blockTraceAndLog.Logs)
+
 		/*
 		// Now, parse log data
 		var logs BlockLogs
