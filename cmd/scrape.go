@@ -241,6 +241,9 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		startIdx := 0
 		for i := 0; i < 20; i ++ {
 			endIdx := startIdx + chunkSize
+			if endIdx >= len(blockTraceAndLog.Logs) {
+				endIdx = len(blockTraceAndLog.Logs) - 1
+			}
 			// move the end of the chunk to a "safe location"
 			// e.g. chunks must start and end on ], }
 			for j := endIdx; j < len(blockTraceAndLog.Traces); j++ {
@@ -265,8 +268,8 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		startIdx = 0
 		for i := 0; i < 20; i ++ {
 			endIdx := startIdx + chunkSize
-			if endIdx > len(blockTraceAndLog.Logs) {
-				fmt.Println("HEREERERE")
+			if endIdx >= len(blockTraceAndLog.Logs) {
+				endIdx = len(blockTraceAndLog.Logs) - 1
 			}
 			// move the end of the chunk to a "safe location"
 			// e.g. chunks must start and end on ], }
