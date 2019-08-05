@@ -339,11 +339,11 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		*/
 		
 		// NEW STATE MACHINE IMPL
-		blockNumberStr := leftPad(blockTraceAndLog.BlockNumber, 9)
+		blockNumberStr := leftPad(strconv.FormatInt(blockTraceAndLog.BlockNumber, 10), 9)
 		addressMapNew := make(map[string]bool) 
 		TraceStateMachine(blockTraceAndLog.Traces, addressMapNew, blockNumberStr)
 		LogStateMachine(blockTraceAndLog.Logs, addressMapNew, blockNumberStr)
-		writeAddresses("SM" + blockNum, addressMapNew, nBlocks, ripeBlock, unripePath, ripePath)
+		writeAddresses("SM" + blockNumberStr, addressMapNew, nBlocks, ripeBlock, unripePath, ripePath)
 	}
 	addressWG.Done()
 }
