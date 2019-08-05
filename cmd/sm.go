@@ -435,15 +435,15 @@ func LogStateMachine(logs []byte) map[string]bool {
 			case STATE_O_AFTER_P_CAP:
 				transactionPositionStart :=  index + 8
 				transactionPositionEnd := index + 8
-				for j := transactionPositionStart; j < len(traces); j++ {
-					if traces[j] == comma {
+				for j := transactionPositionStart; j < len(logs); j++ {
+					if logs[j] == comma {
 						transactionPositionEnd = j
 						break
 					}
 				}
 
 				// Write out addresses to map
-				transactionPositionStr := leftPad(string(traces[transactionPositionStart: transactionPositionEnd]), 5)
+				transactionPositionStr := leftPad(string(logs[transactionPositionStart: transactionPositionEnd]), 5)
 				fmt.Println("Transaction Position:", transactionPositionStr)
 
 				for j := 0; j < addressesIndex; j++ {
