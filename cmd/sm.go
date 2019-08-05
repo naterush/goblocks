@@ -6,7 +6,7 @@ import (
 )
 
 
-func TraceStateMachine(traces []byte) map[string]bool {
+func TraceStateMachine(traces []byte, addressMap map[string]bool){
 	// Declare all the states we need
 	const (
 		STATE_START = iota
@@ -56,9 +56,6 @@ func TraceStateMachine(traces []byte) map[string]bool {
 	addressesIndex := 0
 
 	blockNumStr := "005000000"
-
-	// Address + block + index store
-	addressMap := make(map[string]bool)
 
 	for index := 0; index < len(traces); index++ {
 		token := traces[index]
@@ -286,12 +283,11 @@ func TraceStateMachine(traces []byte) map[string]bool {
 			state = STATE_START
 		}
 	}
-	return addressMap
 }
 
 
 
-func LogStateMachine(logs []byte) map[string]bool {
+func LogStateMachine(logs []byte, addressMap map[string]bool) {
 	// Declare all the states we need
 	const (
 		STATE_START = iota
@@ -325,9 +321,6 @@ func LogStateMachine(logs []byte) map[string]bool {
 	addressesIndex := 0
 
 	blockNumStr := "005000000"
-
-	// Address + block + index store
-	addressMap := make(map[string]bool)
 
 	for index := 0; index < len(logs); index++ {
 		token := logs[index]
@@ -460,5 +453,4 @@ func LogStateMachine(logs []byte) map[string]bool {
 			state = STATE_START
 		}
 	}
-	return addressMap
 }
