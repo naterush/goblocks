@@ -243,8 +243,8 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		//fmt.Println(string(blockTraceAndLog.Traces[:]))
 		for startIdx < len(blockTraceAndLog.Traces) {
 			endIdx := startIdx + chunkSize
-			if endIdx >= len(blockTraceAndLog.Logs)  {
-				endIdx = len(blockTraceAndLog.Logs)
+			if endIdx >= len(blockTraceAndLog.Traces)  {
+				endIdx = len(blockTraceAndLog.Traces)
 			} else {
 				// move the end of the chunk to a "safe location"
 				// here, we move to "y" in type, which
