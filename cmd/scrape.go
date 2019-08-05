@@ -235,7 +235,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			} else {
 				endIdx = len(blockTraceAndLog.Logs)
 			}
-			go LogStateMachine(blockTraceAndLog.Logs[startIdx:endIdx], addressMap, blockNumberStr)
+			go LogStateMachine(blockTraceAndLog.Logs[startIdx:endIdx], addressMap, blockNumberStr, &logWG)
 		}
 
 		traceWG.Wait()
