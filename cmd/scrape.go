@@ -304,7 +304,7 @@ func getTracesAndLogs(rpcProvider string, blockChannel chan int, addressChannel 
 func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, addressWG *sync.WaitGroup, nBlocks int, ripeBlock int, unripePath string, ripePath string) {
 
 	for blockTraceAndLog := range addressChannel {
-		/*
+		
 		addressMap := make(map[string]bool)
 
 		// Parse the traces
@@ -336,14 +336,14 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			writeAddresses(blockNum, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
 		} 
 		writeAddresses(blockNum, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
-		*/
+		
 		
 		// NEW STATE MACHINE IMPL
 		blockNumberStr := leftPad(strconv.Itoa(blockTraceAndLog.BlockNumber), 9)
 		addressMapNew := make(map[string]bool) 
 		TraceStateMachine(blockTraceAndLog.Traces, addressMapNew, blockNumberStr)
 		LogStateMachine(blockTraceAndLog.Logs, addressMapNew, blockNumberStr)
-		writeAddresses(blockNumberStr, addressMapNew, nBlocks, ripeBlock, unripePath, ripePath)
+		writeAddresses("SM" + blockNumberStr, addressMapNew, nBlocks, ripeBlock, unripePath, ripePath)
 	}
 	addressWG.Done()
 }

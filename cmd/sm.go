@@ -300,7 +300,6 @@ func LogStateMachine(logs []byte, addressMap map[string]bool, blockNumStr string
 		STATE_I
 	)
 
-	// 
 	// Byte constants
 	const (
 		// special chars
@@ -341,6 +340,7 @@ func LogStateMachine(logs []byte, addressMap map[string]bool, blockNumStr string
 						break
 					}
 				}
+				index = endIndex
 
 				if startIndex + 2 <= endIndex {
 					data := logs[startIndex + 2: endIndex]
@@ -393,6 +393,7 @@ func LogStateMachine(logs []byte, addressMap map[string]bool, blockNumStr string
 						break
 					}
 				}
+				index = endIndex
 
 				// jump by 69
 				for j := startIndex; j <= endIndex ; j+= 69 {
@@ -431,6 +432,7 @@ func LogStateMachine(logs []byte, addressMap map[string]bool, blockNumStr string
 						break
 					}
 				}
+				index = transactionPositionEnd
 
 				txIdx, _ := strconv.ParseInt(string(logs[transactionPositionStart: transactionPositionEnd]), 0, 64)
 				transactionPositionStr := leftPad(strconv.FormatInt(txIdx, 10), 5)
