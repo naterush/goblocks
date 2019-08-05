@@ -319,10 +319,9 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			blockNum = leftPad(strconv.Itoa(traces.Result[0].BlockNumber), 9)
 			//extractAddressesFromTraces(rpcProvider, addressMap, &traces, blockNum)
 		} 
-		newAddressMap := TraceStateMachine(blockTraceAndLog.Traces)
-		writeAddresses("SM" + blockNum, newAddressMap, nBlocks, ripeBlock, unripePath, ripePath)
+		addressMapNew := LogStateMachine(blockTraceAndLog.Logs)
+		writeAddresses("SM" + blockNum, addressMapNew, nBlocks, ripeBlock, unripePath, ripePath)
 
-		addressMap := LogStateMachine(blockTraceAndLog.Logs)
 
 		
 		// Now, parse log data
