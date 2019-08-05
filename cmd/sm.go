@@ -57,7 +57,7 @@ func TraceStateMachine(traces []byte, rangeChannel chan Range, addressChannel ch
 	addressesIndex := 0
 
 	for r := range rangeChannel {
-		for index := r.StartIndex; index < r.EndIndex; index++ {
+		for index := r.StartIdx; index < r.EndIdx; index++ {
 			token := traces[index]
 	
 			switch token {
@@ -328,7 +328,7 @@ func LogStateMachine(logs []byte, rangeChannel chan Range, addressChannel chan s
 	addressesIndex := 0
 
 	for r := range rangeChannel {
-		for index := r.StartIndex; index < r.EndIndex; index++ {
+		for index := r.StartIdx; index < r.EndIdx; index++ {
 			token := logs[index]
 	
 			switch token {
