@@ -368,7 +368,17 @@ func LogStateMachine(logs []byte) map[string]bool {
 				state = STATE_A
 			case STATE_T_AFTER_A:
 				// Read in the input data!
-				fmt.Println("DATA:", string(logs[index + 4: index + 10]))
+				startIndex := index + 4
+				endIndex := index + 4
+				for j := startIndex; j < len(logs); j++ {
+					if traces[j] == comma {
+						endIndex = j
+						break
+					}
+				}
+
+
+				fmt.Println("DATA:", string(logs[stateIndex: endIndex]))
 
 				state = STATE_START
 			default:
