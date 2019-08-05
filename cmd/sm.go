@@ -327,7 +327,7 @@ func LogStateMachine(logs []byte, rangeChannel chan Range, addressChannel chan s
 	var addressesInTrace [5000]string
 	addressesIndex := 0
 
-	for r := range rangeChannel {
+	for ran := range rangeChannel {
 		for index := ran.StartIdx; index < ran.EndIdx; index++ {
 			token := logs[index]
 	
