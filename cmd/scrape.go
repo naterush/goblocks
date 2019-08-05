@@ -243,7 +243,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			endIdx := startIdx + chunkSize
 			// move the end of the chunk to a "safe location"
 			// e.g. chunks must start and end on ], }
-			for j := endIndex; j < len(blockTraceAndLog.Traces); j++ {
+			for j := endIdx; j < len(blockTraceAndLog.Traces); j++ {
 				if blockTraceAndLog.Traces[j] == straightCloseBracket || blockTraceAndLog.Traces[j] == curlyCloseBracket {
 					endIdx = j
 					break
@@ -267,7 +267,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			endIdx := startIdx + chunkSize
 			// move the end of the chunk to a "safe location"
 			// e.g. chunks must start and end on ], }
-			for j := endIndex; j < len(blockTraceAndLog.Traces); j++ {
+			for j := endIdx; j < len(blockTraceAndLog.Traces); j++ {
 				if blockTraceAndLog.Logs[j] == straightCloseBracket || blockTraceAndLog.Logs[j] == curlyCloseBracket {
 					endIdx = j
 					break
