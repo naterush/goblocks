@@ -225,7 +225,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 
 		var logWG sync.WaitGroup
 		logWG.Add(20)
-		chunkSize := len(blockTraceAndLog.Logs) / 20 // amount each jawn processes
+		chunkSize = len(blockTraceAndLog.Logs) / 20 // amount each jawn processes
 		for i := 0; i < 20; i ++ {
 			startIdx := i * chunkSize
 			endIdx := (i + 1) * chunkSize
