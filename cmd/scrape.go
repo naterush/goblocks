@@ -282,10 +282,12 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 			rangeChannelLogs <- Range{startIdx, endIdx}
 			startIdx = endIdx
 		}
-
+		fmt.Println("\n\nWAITING FOR TRACES AND LOGS")
 		// Wait for the various state machines to finish
 		traceWG.Wait()
+		fmt.Println("TRACES FINISHED")
 		logWG.Wait()
+		fmt.Println("LOGS FINISHED")
 		// Close the address channel, to notify the address receiver all have been sent
 		close(addressChannel)
 		// wait for the address receiver to write out the file
