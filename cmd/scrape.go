@@ -241,6 +241,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		// Send the approprate ranges to the TraceStateMachines
 		chunkSize := len(blockTraceAndLog.Traces) / 20 // amount each jawn processes
 		startIdx := 0
+		fmt.Println(string(blockTraceAndLog.Traces[:]))
 		for i := 0; i < 20; i ++ {
 			endIdx := startIdx + chunkSize
 			if endIdx >= len(blockTraceAndLog.Logs) {
@@ -254,7 +255,7 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 					break
 				}
 			}
-			fmt.Println(string(blockTraceAndLog.Traces[startIdx:endIdx]))
+			//fmt.Println(string(blockTraceAndLog.Traces[startIdx:endIdx]))
 			rangeChannelTraces <- Range{startIdx, endIdx}
 			startIdx = endIdx
 		}
