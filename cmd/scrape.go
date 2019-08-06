@@ -206,8 +206,8 @@ func extractAddresses(rpcProvider string, addressChannel chan BlockInternals, ad
 		
 		addressMap := make(map[string]bool)
 		blockNumberStr := leftPad(strconv.Itoa(blockTraceAndLog.BlockNumber), 9)
-		fmt.Println(string(blockTraceAndLog.Traces))
 		TraceStateMachine(blockTraceAndLog.Traces, addressMap, blockNumberStr)
+		fmt.Println(string(blockTraceAndLog.Logs))
 		LogStateMachine(blockTraceAndLog.Logs, addressMap, blockNumberStr)
 		writeAddresses(blockNumberStr, addressMap, nBlocks, ripeBlock, unripePath, ripePath)
 	}
